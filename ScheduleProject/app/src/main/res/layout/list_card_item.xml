@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
+    app:cardUseCompatPadding="true"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="20dp"
+    android:layout_margin="8dp"
+    android:background="@color/colorCardBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/colorCardBackground">
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:gravity="center_horizontal"
+               android:background="@color/colorForHeader">
+               <EditText
+                   android:id="@+id/ListName"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center"
+                   android:background="@android:color/transparent"
+                   android:text= "To do "
+                   android:cursorVisible="false"
+                   />
+               <Button
+                   android:id="@+id/showMenuOptionButton"
+                   android:layout_width="35dp"
+                   android:layout_height="35dp"
+                   android:text="..."
+                   android:textSize="20sp"
+                   android:gravity="center_horizontal"
+                   android:layout_gravity="end"
+                   android:layout_alignParentRight="true"
+                   android:background="@color/colorForHeader"/>
+           </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/listTaskRecycleView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/addCardButton"
+                style="@style/CardActionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:gravity= "left|center_vertical|center_horizontal"
+                android:text="@string/add_card_name"
+                />
+        </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

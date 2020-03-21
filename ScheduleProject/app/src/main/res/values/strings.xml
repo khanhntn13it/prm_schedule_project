@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ScheduleProject</string>
+    <string name="add_card_name">+ Add a card</string>
 </resources>
