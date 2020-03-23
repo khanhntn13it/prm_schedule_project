@@ -1,5 +1,19 @@
 <resources>
     <string name="app_name">ScheduleProject</string>
+    <string name="task_create_title">Enter title</string>
+    <string name="task_create_des">Enter description</string>
+    <string name="task_create_date">Enter date</string>
+    <string name="task_create_rbtn_not">Not yet</string>
+    <string name="task_create_rbtn_doing">Doing</string>
+    <string name="task_create_rbtn_done">Done</string>
+    <string name="task_create_rbtn_status">Status</string>
+    <string name="task_create_priority">Priority</string>
+    <string name="task_create_image">Image</string>
+    <string name="task_create_camera">Camera</string>
+    <string name="task_create_upload">Upload</string>
+    <string name="btn_save">SAVE</string>
+    <string name="task_create_datePicker">Choose Date</string>
+    <string name="task_create_timePicker">Choose time</string>
     <string name="add_card_name">+ Add a card</string>
     <string name="search_name">Search</string>
     <string name="add_list_name">Add list</string>
