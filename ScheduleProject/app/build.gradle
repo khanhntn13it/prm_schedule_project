@@ -46,5 +46,6 @@ dependencies {
     // code generator for view
     implementation "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
-
+    // For filter search
+    implementation 'com.allattentionhere:fabulousfilter:0.0.5'
 }

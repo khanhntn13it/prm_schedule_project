@@ -16,5 +16,7 @@
     <string name="task_create_timePicker">Choose time</string>
     <string name="add_card_name">+ Add a card</string>
     <string name="search_name">Search</string>
+    <string name="search_hint">Search task here</string>
     <string name="add_list_name">Add list</string>
+    <string name="edit_name">Edit title</string>
 </resources>
