@@ -14,16 +14,9 @@
     <string name="btn_save">SAVE</string>
     <string name="task_create_datePicker">Choose Date</string>
     <string name="task_create_timePicker">Choose time</string>
-
-    <string name="register_button_title">Register</string>
-    <string name="loggin_button_title">Log In</string>
-    <string name="create_board_title">Create New Board</string>
-    <string name="create_board_name">Name</string>
-    <string name="create_board_color">Color</string>
-    <string name="Edit_Button_Title">Edit</string>
-    <string name="App_Icon_Description">This is app icon</string>
-    <string name="Add_Board_Button_Text">+</string>
-    <string name="Text_Current_Color">Current Color</string>
-    <string name="Text_Edit_Board">Edit Board</string>
-    <string name="Text_Enter_Name">Enter Name</string>
+    <string name="add_card_name">+ Add a card</string>
+    <string name="search_name">Search</string>
+    <string name="search_hint">Search task here</string>
+    <string name="add_list_name">Add list</string>
+    <string name="edit_name">Edit title</string>
 </resources>

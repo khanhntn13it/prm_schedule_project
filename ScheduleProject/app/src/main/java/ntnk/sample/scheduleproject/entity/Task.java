@@ -13,7 +13,15 @@ public class Task {
 
     public Task() {
     }
-
+    public Task(String title) {
+        this.id = 1;
+        this.title = title;
+        this.date = new Date();
+        this.description = "";
+        status = 1;
+        urgent_importance = 1;
+        boardId =1;
+    }
     public int getId() {
         return id;
     }
