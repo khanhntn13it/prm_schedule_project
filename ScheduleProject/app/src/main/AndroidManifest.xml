@@ -26,8 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.UpdateTaskActivity" />
-        <activity android:name=".activity.DetailTaskActivity" />
+<!--        <activity android:name=".activity.UpdateTaskActivity" />-->
+<!--        <activity android:name=".activity.DetailTaskActivity" />-->
         <activity android:name=".activity.CreateTaskActivity" />
         <activity android:name=".activity.MainActivity">
             <intent-filter>
