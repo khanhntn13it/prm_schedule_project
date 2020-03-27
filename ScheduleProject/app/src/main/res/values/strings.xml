@@ -14,6 +14,7 @@
     <string name="btn_save">SAVE</string>
     <string name="task_create_datePicker">Choose Date</string>
     <string name="task_create_timePicker">Choose time</string>
+    <string name="task_create_inactive">Error to open this activity. Not found group Id</string>
     <string name="register_button_title">Register</string>
     <string name="loggin_button_title">Log In</string>
     <string name="create_board_title">Create New Board</string>

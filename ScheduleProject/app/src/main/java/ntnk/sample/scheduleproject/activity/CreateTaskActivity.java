@@ -1,6 +1,7 @@
 package ntnk.sample.scheduleproject.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -50,9 +51,9 @@ import butterknife.ButterKnife;
 import ntnk.sample.scheduleproject.BuildConfig;
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.entity.Task;
-import ntnk.sample.scheduleproject.entity.TaskImage;
+//import ntnk.sample.scheduleproject.entity.TaskImage;
+import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.sqlite.TaskDatabaseHelper;
-import ntnk.sample.scheduleproject.sqlite.TaskImageDBHelper;
 import ntnk.sample.scheduleproject.utils.FileCompressor;
 
 public class CreateTaskActivity extends AppCompatActivity {
@@ -80,13 +81,11 @@ public class CreateTaskActivity extends AppCompatActivity {
     DatePickerDialog datePickerDialog;
 
     TaskDatabaseHelper taskDB;
-    TaskImageDBHelper taskImageDBHelper;
+    TaskDAO taskDAO;
+    int groupId;
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_GALLERY_PHOTO = 2;
-//    static final int MAX_NUMBER_IMAGE = 5;
-//    private List<Bitmap> bitmaps;
-//    private List<TaskImage> taskImages;//max size = 5
 
     File mPhotoFile;
     FileCompressor mCompressor;
@@ -96,20 +95,26 @@ public class CreateTaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        groupId = intent.getIntExtra("groupId", -1);
+        if(groupId  < 0){
+            setContentView(R.layout.activity_create_task_inactive);
+            return;
+        }
         setContentView(R.layout.activity_create_task);
 
         assignUIComponent();
-        taskDB = new TaskDatabaseHelper(this);
-        taskImageDBHelper = new TaskImageDBHelper(this);
-
-//        bitmaps = new ArrayList<>();
-//        taskImages = new ArrayList<>();
+        taskDAO = new TaskDAO(this);
 
         dateStr = "";
         timeStr = "";
+        setDefaultDateTime();
 
         ButterKnife.bind(this);
         mCompressor = new FileCompressor(this);
+
+
     }
 
     private void assignUIComponent(){
@@ -126,6 +131,18 @@ public class CreateTaskActivity extends AppCompatActivity {
         radioButtonPriority2 = findViewById(R.id.radioButtonUI2);
         radioButtonPriority3 = findViewById(R.id.radioButtonUI3);
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
+    }
+
+    private void setDefaultDateTime(){
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DATE);
+        int hour = calendar.get(Calendar.HOUR);
+        int minute = calendar.get(Calendar.MINUTE);
+        dateStr = year +"-"+month + "-" + day;
+        timeStr = hour +":"+minute;
+        editTextDate.setText(dateStr+ " " + timeStr);
     }
 
     public void datePickerAction(View view){
@@ -211,20 +228,23 @@ public class CreateTaskActivity extends AppCompatActivity {
             task.setUrgent_importance(4);
         }
 
-        long taskid = taskDB.insert(task);
-
         if(mPhotoFile != null){
             try {
                 String path = mCompressor.saveToExternalStorage(mPhotoFile);
-                TaskImage taskImage = new TaskImage();
-                taskImage.setTaskId(taskid);
-                taskImage.setImage(path);
-                taskImageDBHelper.insert(taskImage);
+                task.setTaskImage(path);
                 editTextTitle.setText("image path external saved: " + path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        task.setGroupId(groupId);
+        long taskid = taskDAO.insert(task);
+
+        Intent returnIntent = new Intent();
+        task.setId((int) taskid);
+        returnIntent.putExtra("new_task", task);
+        setResult(100,returnIntent);
+        finish();
     }
 
 

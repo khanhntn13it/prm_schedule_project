@@ -81,6 +81,9 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, CreateTaskActivity.class);
+                //pass groupId *********
+
+                //startForReult***********
                 activity.startActivity(intent);
             }
         });
