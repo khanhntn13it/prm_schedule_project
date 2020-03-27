@@ -31,4 +31,9 @@
     <string name="search_hint">Search task here</string>
     <string name="add_list_name">Add list</string>
     <string name="edit_name">Edit title</string>
+    <string name="task_notfound">This actvity not open. Task not found.</string>
+    <string name="create_task_header">Add New Task</string>
+    <string name="update_task_header">Update Task</string>
+    <string name="task_detail_header">Task Detail</string>
+    <string name="btn_back">Back</string>
 </resources>
