@@ -33,19 +33,23 @@ dependencies {
     //add-------------------------
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
+
     // reactive
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxjava2Version"
     implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
+
+    //for glide load image
     implementation('com.github.bumptech.glide:glide:4.7.1@aar') {
         transitive = true
     }
-    /**
-     * For managing request permission
-     */
+
+    //For managing request permission
     implementation 'com.karumi:dexter:4.2.0'
+
     // code generator for view
     implementation "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
+
     // For filter search
     implementation 'com.allattentionhere:fabulousfilter:0.0.5'
 }
