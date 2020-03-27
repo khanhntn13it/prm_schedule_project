@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import ntnk.sample.scheduleproject.entity.Board;
-import ntnk.sample.scheduleproject.sqlite.BoardDatabaseHelper;
+import ntnk.sample.scheduleproject.sqlite.BoardDAO;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 import ntnk.sample.scheduleproject.R;
@@ -18,14 +18,14 @@ import ntnk.sample.scheduleproject.R;
 public class CreateBoardActivity extends AppCompatActivity {
 
     int mDefaultColor;
-    BoardDatabaseHelper bdh;
+    BoardDAO boardDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_board);
 
-        bdh = BoardActivity.getBoardDatabase();
+        boardDAO = BoardActivity.getBoardDatabase();
 
         mDefaultColor = ContextCompat.getColor(CreateBoardActivity.this, R.color.colorPrimary);
 
@@ -44,7 +44,7 @@ public class CreateBoardActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 Board board = new Board(BoardActivity.getBoardList().size() + 2, textName.getText().toString(), mDefaultColor);
-                bdh.insert(board);
+                boardDAO.insert(board);
                 setResult(200, intent);
                 finish();
             }
