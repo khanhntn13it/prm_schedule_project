@@ -1,27 +1,34 @@
 package ntnk.sample.scheduleproject.entity;
 
-import java.util.Date;
+import android.os.Parcel;
 
-public class Task {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class Task implements Serializable {
     private int id;
     private String title;
     private Date date;
     private String description;
     private int status;
     private int urgent_importance;
-    private int boardId;
+    private int groupId;
+    private String taskImage;
 
     public Task() {
     }
-    public Task(String title) {
+
+    public Task(String title, int groupId) {
         this.id = 1;
         this.title = title;
         this.date = new Date();
         this.description = "";
-        status = 1;
-        urgent_importance = 1;
-        boardId =1;
+        this.groupId = groupId;
+        this.taskImage = null;
     }
+
     public int getId() {
         return id;
     }
@@ -71,11 +78,19 @@ public class Task {
         this.urgent_importance = urgent_importance;
     }
 
-    public int getBoardId() {
-        return boardId;
+    public int getGroupId() {
+        return groupId;
     }
 
-    public void setBoardId(int boardId) {
-        this.boardId = boardId;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getTaskImage() {
+        return taskImage;
+    }
+
+    public void setTaskImage(String taskImage) {
+        this.taskImage = taskImage;
     }
 }
