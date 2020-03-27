@@ -55,7 +55,7 @@ public class BoardActivity extends AppCompatActivity {
 //                        "Redirect to list tasks of board in position " + String.valueOf(position)
 //                        , Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(BoardActivity.this, MainActivity.class);
-                intent.putExtra("boardId", boardDAO.getListBoards().get(position).getId());
+                intent.putExtra("boardId", list.get(position).getId());
                 startActivity(intent);
             }
         });

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class TaskDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "schedule_database";
-    private static final int DB_VER = 3;
+    private static final int DB_VER = 4;
     private static final String BOARD_CREATE = "CREATE TABLE board (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "name TEXT, " +

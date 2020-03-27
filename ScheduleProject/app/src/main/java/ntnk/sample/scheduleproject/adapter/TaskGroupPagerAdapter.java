@@ -83,10 +83,9 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
                 Intent intent = new Intent(activity, CreateTaskActivity.class);
 
                 //pass groupId *********
-                intent.putExtra("group_id", current.getId());
-                //startForReult***********
-
-                activity.startActivityForResult(intent, 400);
+                intent.putExtra("groupId", current.getId());
+                //startForResult***********
+                activity.startActivityForResult(intent, 101);
             }
         });
         // set up Recycle view

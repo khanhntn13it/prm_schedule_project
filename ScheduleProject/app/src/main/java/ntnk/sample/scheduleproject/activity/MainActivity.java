@@ -167,11 +167,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
-             if(requestCode == 400 && resultCode == 300) {
+             if(requestCode == 101 && resultCode == 201) {
                     setCurrentTaskRecycleViewAdapter();
                     Task newTask = (Task) data.getSerializableExtra("new_task");
                     taskRecycleViewAdapter.addItem(newTask);
                 }
+            if(requestCode == 102 && resultCode == 202) {
+                setCurrentTaskRecycleViewAdapter();
+                Task updateTask = (Task) data.getSerializableExtra("update_task");
+                int position = data.getIntExtra("taskPosi", -1);
+                if(position >= 0) {
+                    taskRecycleViewAdapter.updateItem(position, updateTask);
+                }
+            }
         }
     }
 

@@ -238,8 +238,8 @@ public class CreateTaskActivity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         task.setId((int) taskid);
         returnIntent.putExtra("new_task", task);
-        setResult(300,returnIntent);
-        //finish();
+        setResult(201,returnIntent);
+        finish();
     }
 
 

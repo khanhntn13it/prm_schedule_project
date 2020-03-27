@@ -41,7 +41,7 @@ public class TaskGroupDAO extends ModelDAO {
         db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query("task_group",
                 new String[]{"id", "title", "board_id",},
-                "id = ?",
+                "board_id = ?",
                 new String[]{String.valueOf(boardId)},
                 null, null, null, null);
         if (cursor == null) {

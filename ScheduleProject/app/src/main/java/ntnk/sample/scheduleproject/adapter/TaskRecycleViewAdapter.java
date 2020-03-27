@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ntnk.sample.scheduleproject.R;
+import ntnk.sample.scheduleproject.activity.UpdateTaskActivity;
+import ntnk.sample.scheduleproject.activity.ViewTaskActivity;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.sqlite.TaskGroupDAO;
@@ -61,20 +63,19 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
             @Override
             public void onClick(View v) {
                 // next to edit View
-                Intent intent = new Intent();
-                intent.putExtra("task_id", chosen);
-//                activity.setResult(200);
-//                activity.finish();
-                //Toast.makeText(v.getContext(), "edit chosen " + chosen.getTitle(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(activity, UpdateTaskActivity.class);
+                intent.putExtra("taskId", chosen.getId());
+                intent.putExtra("taskPosi", currentPosition);
+                activity.startActivityForResult(intent, 102);
+                Toast.makeText(v.getContext(), "edit chosen " + chosen.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
         holder.viewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // next to Detail View
-                //Intent intent = new Intent(activity, ViewActivity.class);
-                Intent intent = new Intent();
-                intent.putExtra("task_id", chosen);
+                Intent intent = new Intent(activity, ViewTaskActivity.class);
+                intent.putExtra("taskId", chosen.getId());
                 activity.startActivity(intent);
                 Toast.makeText(v.getContext(), "chosen " + chosen.getTitle(), Toast.LENGTH_SHORT).show();
             }
@@ -96,9 +97,9 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                     builder.setPositiveButton("Yup", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            removeItem(currentPosition);
-                            taskDB.deleteTaskById(chosen.getId());
 
+                            taskDB.deleteTaskById(chosen.getId());
+                            removeItem(currentPosition);
                             Toast.makeText(activity, "DELETED! As you wish!", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -123,14 +124,15 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
     }
 
     public void removeItem(int position) {
-        if (resultSearchList.size() == 1 || taskList.size() == 1) position = 0;
+        //if (resultSearchList.size() == 1 || taskList.size() == 1) position = 0;
         resultSearchList.remove(position);
-        taskList.remove(position);
-        notifyItemRemoved(position);
+        //taskList.remove(position);
+        notifyDataSetChanged();
+        //notifyItemRangeChanged(position, taskList.size());
     }
     public void updateItem(int position, Task task) {
         resultSearchList.set(position, task);
-        taskList.set(position, task);
+        //taskList.set(position, task);
         notifyItemChanged(position, task);
     }
     public Task getItem(int position) {

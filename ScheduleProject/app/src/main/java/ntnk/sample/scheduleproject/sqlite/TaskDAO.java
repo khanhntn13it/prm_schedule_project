@@ -56,7 +56,7 @@ public class TaskDAO extends ModelDAO {
         db = dbHelper.getReadableDatabase();
         List<Task> result = new ArrayList<>();
         Cursor cursor = db.query("task",
-                new String[]{"id", "title", "date", "description", "status", "urgent_importance", "group_id"},
+                new String[]{"id", "title", "date", "description", "status", "urgent_importance", "group_id", "image"},
                 "group_id = ?",
                 new String[]{String.valueOf(groupId)},
                 null, null, null, null);
