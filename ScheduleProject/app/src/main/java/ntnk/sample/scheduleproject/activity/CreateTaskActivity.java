@@ -1,14 +1,12 @@
 package ntnk.sample.scheduleproject.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -41,7 +39,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -51,9 +48,7 @@ import butterknife.ButterKnife;
 import ntnk.sample.scheduleproject.BuildConfig;
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.entity.Task;
-//import ntnk.sample.scheduleproject.entity.TaskImage;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
-import ntnk.sample.scheduleproject.sqlite.TaskDatabaseHelper;
 import ntnk.sample.scheduleproject.utils.FileCompressor;
 
 public class CreateTaskActivity extends AppCompatActivity {

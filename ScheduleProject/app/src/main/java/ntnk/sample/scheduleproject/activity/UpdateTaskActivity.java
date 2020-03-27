@@ -90,7 +90,7 @@ public class UpdateTaskActivity extends AppCompatActivity {
         taskDAO = new TaskDAO(this);
         Intent intent = getIntent();
         //*****remember to fix default value*******************************
-        int taskId = intent.getIntExtra("taskId", 1);
+        int taskId = intent.getIntExtra("taskId", -1);
         if(taskId  < 0){
             setContentView(R.layout.activity_task_notfound);
             return;
@@ -102,12 +102,10 @@ public class UpdateTaskActivity extends AppCompatActivity {
             }
         }
         setContentView(R.layout.activity_update_task);
-
-        assignUIComponent();
-
-
+        
         dateStr = "";
         timeStr = "";
+        assignUIComponent();
         setCurrentData();
 
         ButterKnife.bind(this);
