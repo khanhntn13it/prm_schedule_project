@@ -3,7 +3,6 @@ package ntnk.sample.scheduleproject.sqlite;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.text.DateFormat;
@@ -14,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 
 import ntnk.sample.scheduleproject.entity.Task;
-import ntnk.sample.scheduleproject.entity.TaskImage;
 
 public class TaskDAO extends ModelDAO {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
@@ -81,6 +79,7 @@ public class TaskDAO extends ModelDAO {
             task.setStatus(cursor.getInt(cursor.getColumnIndex("status")));
             task.setUrgent_importance(cursor.getInt(cursor.getColumnIndex("urgent_importance")));
             task.setGroupId(cursor.getInt(cursor.getColumnIndex("group_id")));
+            task.setTaskImage(cursor.getString(cursor.getColumnIndex("image")));
             result.add(task);
         }
         return result;
@@ -101,7 +100,7 @@ public class TaskDAO extends ModelDAO {
         contentValues.put("status", task.getStatus());
         contentValues.put("urgent_importance", task.getUrgent_importance());
         contentValues.put("group_id", task.getGroupId());
-
+        contentValues.put("image", task.getTaskImage());
         return db.insert("task", null, contentValues);
     }
 //    title, data, description, status, urgent-importance, board_id
@@ -122,6 +121,7 @@ public class TaskDAO extends ModelDAO {
         contentValues.put("status", task.getStatus());
         contentValues.put("urgent_importance", task.getUrgent_importance());
         contentValues.put("group_id", task.getGroupId());
+        contentValues.put("image", task.getTaskImage());
 
         return db.update("task",
                 contentValues,
