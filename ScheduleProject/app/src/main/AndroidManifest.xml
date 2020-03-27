@@ -17,24 +17,53 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.EditBoardActivity"></activity>
+
+        <activity android:name=".activity.EditBoardActivity" />
         <activity android:name=".activity.CreateBoardActivity" />
         <activity android:name=".activity.BoardActivity">
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity android:name=".activity.CreateTaskActivity">
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity android:name=".activity.ViewTaskActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--        <activity android:name=".activity.UpdateTaskActivity" />-->
-<!--        <activity android:name=".activity.DetailTaskActivity" />-->
-        <activity android:name=".activity.CreateTaskActivity" />
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".activity.UpdateTaskActivity">
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
+        </activity>
+        <activity android:name=".activity.MainActivity">
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
         </activity>
 
         <provider

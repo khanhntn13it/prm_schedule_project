@@ -1,5 +1,8 @@
 package ntnk.sample.scheduleproject.activity;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -13,16 +16,12 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -49,9 +48,10 @@ import ntnk.sample.scheduleproject.BuildConfig;
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
+import ntnk.sample.scheduleproject.sqlite.TaskDatabaseHelper;
 import ntnk.sample.scheduleproject.utils.FileCompressor;
 
-public class CreateTaskActivity extends AppCompatActivity {
+public class UpdateTaskActivity extends AppCompatActivity {
 
     private EditText editTextTitle;
     private EditText editTextDescription;
@@ -65,10 +65,6 @@ public class CreateTaskActivity extends AppCompatActivity {
     private RadioButton radioButtonPriority3;
     private RadioButton radioButtonPriority4;
 
-//    private Button buttonCamera;
-//    private Button buttonUpload;
-//    private Button buttonSave;
-
     String dateStr;
     String timeStr;
 
@@ -76,7 +72,7 @@ public class CreateTaskActivity extends AppCompatActivity {
     DatePickerDialog datePickerDialog;
 
     TaskDAO taskDAO;
-    int groupId;
+    Task task;
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_GALLERY_PHOTO = 2;
@@ -89,25 +85,31 @@ public class CreateTaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_update_task);
 
-        Intent intent = getIntent();
-        groupId = intent.getIntExtra("groupId", -1);
-//        if(groupId  < 0){
-////            setContentView(R.layout.activity_create_task_inactive);
-////            return;
-////        }
-        setContentView(R.layout.activity_create_task);
-
-        assignUIComponent();
         taskDAO = new TaskDAO(this);
-
+        Intent intent = getIntent();
+        //*****remember to fix default value*******************************
+        int taskId = intent.getIntExtra("taskId", -1);
+        if(taskId  < 0){
+            setContentView(R.layout.activity_task_notfound);
+            return;
+        }else {
+            task = taskDAO.getTaskById(taskId);
+            if(task == null){
+                setContentView(R.layout.activity_task_notfound);
+                return;
+            }
+        }
+        setContentView(R.layout.activity_update_task);
+        
         dateStr = "";
         timeStr = "";
-        setDefaultDateTime();
+        assignUIComponent();
+        setCurrentData();
 
         ButterKnife.bind(this);
         mCompressor = new FileCompressor(this);
-
 
     }
 
@@ -127,16 +129,55 @@ public class CreateTaskActivity extends AppCompatActivity {
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
     }
 
-    private void setDefaultDateTime(){
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DATE);
-        int hour = calendar.get(Calendar.HOUR);
-        int minute = calendar.get(Calendar.MINUTE);
-        dateStr = year +"-"+month + "-" + day;
-        timeStr = hour +":"+minute;
-        editTextDate.setText(dateStr+ " " + timeStr);
+    private void setCurrentData(){
+        editTextTitle.setText(task.getTitle());
+        editTextDescription.setText(task.getDescription());
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String datetime = dateFormat.format(task.getDate());
+        editTextDate.setText(datetime);
+        dateStr = datetime.substring(0,9);
+        timeStr = datetime.substring(11);
+
+        switch (task.getStatus()){
+            case 1 :{
+                radioButtonNotyet.setChecked(true);
+                break;
+            }
+            case 2 :{
+                radioButtonDoing.setChecked(true);
+                break;
+            }
+            case 3 :{
+                radioButtonDone.setChecked(true);
+                break;
+            }
+        }
+
+        switch (task.getUrgent_importance()){
+            case 1:{
+                radioButtonPriority1.setChecked(true);
+                break;
+            }
+            case 2:{
+                radioButtonPriority2.setChecked(true);
+                break;
+            }
+            case 3:{
+                radioButtonPriority3.setChecked(true);
+                break;
+            }
+            case 4:{
+                radioButtonPriority4.setChecked(true);
+                break;
+            }
+        }
+        if(task.getTaskImage() != null) {
+            Glide.with(UpdateTaskActivity.this)
+                    .load(task.getTaskImage())
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.profile_pic_place_holder))
+                    .into(imageViewProfilePic);
+        }
     }
 
     public void datePickerAction(View view){
@@ -163,7 +204,7 @@ public class CreateTaskActivity extends AppCompatActivity {
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 timeStr = hourOfDay +":"+minute;
                 if(dateStr.equals("")){
-                   dateStr = calendar.get(Calendar.YEAR) + "-"
+                    dateStr = calendar.get(Calendar.YEAR) + "-"
                             + (calendar.get(Calendar.MONTH)+1) + "-"
                             + calendar.get(Calendar.DATE);
                 }
@@ -231,12 +272,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        task.setGroupId(groupId);
-        long taskid = taskDAO.insert(task);
+
+        taskDAO.update(task);
 
         Intent returnIntent = new Intent();
-        task.setId((int) taskid);
-        returnIntent.putExtra("new_task", task);
+        returnIntent.putExtra("update_task", task);
         setResult(100,returnIntent);
 //        finish();
     }
@@ -247,16 +287,16 @@ public class CreateTaskActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
                 try {
-                mPhotoFile = mCompressor.compressToFile(mPhotoFile);
+                    mPhotoFile = mCompressor.compressToFile(mPhotoFile);
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Glide.with(CreateTaskActivity.this)
+                Glide.with(UpdateTaskActivity.this)
                         .load(mPhotoFile)
                         .apply(new RequestOptions()
-                            .placeholder(R.drawable.profile_pic_place_holder))
-                    .into(imageViewProfilePic);
+                                .placeholder(R.drawable.profile_pic_place_holder))
+                        .into(imageViewProfilePic);
 
             } else if (requestCode == REQUEST_GALLERY_PHOTO) {
                 Uri selectedImage = data.getData();
@@ -266,11 +306,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            Glide.with(CreateTaskActivity.this)
-                    .load(mPhotoFile)
-                    .apply(new RequestOptions()
-                            .placeholder(R.drawable.profile_pic_place_holder))
-                    .into(imageViewProfilePic);
+                Glide.with(UpdateTaskActivity.this)
+                        .load(mPhotoFile)
+                        .apply(new RequestOptions()
+                                .placeholder(R.drawable.profile_pic_place_holder))
+                        .into(imageViewProfilePic);
             }
         }
     }
