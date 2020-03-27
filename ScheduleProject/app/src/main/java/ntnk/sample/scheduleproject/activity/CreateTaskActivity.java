@@ -222,7 +222,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         task.setId((int) taskid);
         Intent intent = new Intent();
         intent.putExtra("new_task", task);
-        setResult(100, intent);
+        setResult(300, intent);
         finish();
     }
 

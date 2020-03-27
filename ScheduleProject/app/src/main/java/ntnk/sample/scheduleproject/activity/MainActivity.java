@@ -1,19 +1,21 @@
 package ntnk.sample.scheduleproject.activity;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPagerUtils;
@@ -42,10 +44,12 @@ public class MainActivity extends AppCompatActivity {
     int menu_layout = R.menu.search_menu;
     TaskGroupDAO taskGroupDB;
     BoardDAO boardDB;
+    ActionBar actionBar;
     int currentBoardId = -1; // get from intent
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
         taskGroupViewPager = findViewById(R.id.viewPager);
         addListButton = findViewById(R.id.addListButton);
@@ -55,14 +59,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentBoardId = intent.getIntExtra("boardId", -1);
         Board board = boardDB.getBoardByID(currentBoardId);
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(board.getName());
+        actionBar = getSupportActionBar();
+        boardName = board.getName();
+        actionBar.setTitle(boardName);
+        actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        //for testing
-        currentBoardId = 1;
         taskGroupList = taskGroupDB.getTaskGroupListByBoard(currentBoardId);
         if(taskGroupList == null) taskGroupList = new ArrayList<>();
-
         taskGroupPagerAdapter = new TaskGroupPagerAdapter(taskGroupList, this);
 
         taskGroupViewPager.setAdapter(taskGroupPagerAdapter);
@@ -102,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateMenu(int menutoChoose, String title, boolean showXIcon) {
         getSupportActionBar().setTitle(title);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(showXIcon);
         menu_layout = menutoChoose;
         invalidateOptionsMenu();
     }
@@ -110,23 +112,35 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.edit_title) {
-            EditText currentTitle = styleBackForEditText();
-            String new_title = currentTitle.getText().toString();
-            //update taskgroup name title in db
 
-            //change menu_layout to search
-            updateMenu(R.menu.search_menu, boardName, false);
         }
-        if(item.getItemId() == android.R.id.home) {
-            this.finish();
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home: {
+                this.finish();
+                return true;
+            }
+            case R.id.edit_title : {
+                int currentPosi = taskGroupViewPager.getCurrentItem();
+                EditText currentTitle = styleBackForEditText();
+                String new_title = currentTitle.getText().toString();
+                //update taskgroup name title in db
+                TaskGroup updateGroup = taskGroupPagerAdapter.getItemTaskGroup(currentPosi);
+                updateGroup.setTitle(new_title);
+                taskGroupDB.update(updateGroup);
+                taskGroupPagerAdapter.notifyDataSetChanged();
+                //change menu_layout to search
+                updateMenu(R.menu.search_menu, boardName, false);
+            }
         }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         if (menu_layout == R.menu.menu_edit_title)
-            updateMenu(R.menu.search_menu, boardName, false);
+            updateMenu(R.menu.search_menu, boardName, true);
         styleBackForEditText();
         return super.onSupportNavigateUp();
     }
@@ -153,25 +167,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
-            switch (resultCode) {
-                //case insert
-                case 100: {
+             if(requestCode == 400 && resultCode == 300) {
                     setCurrentTaskRecycleViewAdapter();
                     Task newTask = (Task) data.getSerializableExtra("new_task");
-                    taskRecycleViewAdapter.addItem(taskRecycleViewAdapter.getItemCount(), newTask);
+                    int size = taskRecycleViewAdapter.getItemCount();
+                    taskRecycleViewAdapter.addItem(size, newTask);
                 }
-                // case update
-                case 200: {
-                    setCurrentTaskRecycleViewAdapter();
-                    Task newTask = (Task) data.getSerializableExtra("new_task");
-                    int posi = data.getIntExtra("position", -1);
-                    if (posi != -1) {
-                        taskRecycleViewAdapter.updateItem(posi, newTask);
-                    }
-                }
-            }
         }
-
     }
 
     public void setCurrentTaskRecycleViewAdapter() {

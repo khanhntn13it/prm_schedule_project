@@ -60,6 +60,7 @@ public class TaskDAO extends ModelDAO {
                 "group_id = ?",
                 new String[]{String.valueOf(groupId)},
                 null, null, null, null);
+        if(cursor == null) return result;
         while(cursor.moveToNext()) {
             Task task = new Task();
             task.setId(cursor.getInt(cursor.getColumnIndex("id")));

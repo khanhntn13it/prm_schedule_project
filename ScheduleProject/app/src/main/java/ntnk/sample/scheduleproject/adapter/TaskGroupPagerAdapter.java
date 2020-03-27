@@ -82,7 +82,7 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 Intent intent = new Intent(activity, CreateTaskActivity.class);
                 intent.putExtra("group_id", current.getId());
-                activity.startActivityForResult(intent, 100);
+                activity.startActivityForResult(intent, 400);
             }
         });
         // set up Recycle view
@@ -107,8 +107,13 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView((View) object);
     }
-
+    public TaskGroup getItemTaskGroup(int position) {
+        return taskGroupList.get(position);
+    }
     public void onEditTitleClick(EditText view) {
+        if(view.getText().toString().equals("Enter title here")) {
+            view.setText("");
+        }
         // change action bar
         ActionBar actionBar = activity.getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.ic_close_black_24dp);

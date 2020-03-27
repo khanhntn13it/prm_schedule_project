@@ -17,6 +17,11 @@ public class Board implements Serializable {
         this.color = color;
         this.taskGroups = new ArrayList<>();
     }
+    public Board(String name, int color) {
+        this.name = name;
+        this.color = color;
+        this.taskGroups = new ArrayList<>();
+    }
 
     public Board() {
     }

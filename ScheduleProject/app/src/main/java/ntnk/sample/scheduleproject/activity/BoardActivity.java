@@ -18,13 +18,13 @@ import java.util.List;
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.adapter.BoardAdapter;
 import ntnk.sample.scheduleproject.entity.Board;
-import ntnk.sample.scheduleproject.sqlite.BoardDatabaseHelper;
+import ntnk.sample.scheduleproject.sqlite.BoardDAO;
 
 public class BoardActivity extends AppCompatActivity {
 
     private static List<Board> list;
     public static ListView listView;
-    public static BoardDatabaseHelper bdh;
+    public static BoardDAO boardDAO;
     public static BoardAdapter adapter;
 
     @Override
@@ -32,8 +32,8 @@ public class BoardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board);
         list = new ArrayList<>();
-        bdh = new BoardDatabaseHelper(this);
-        list = bdh.getListBoards();
+        boardDAO = new BoardDAO(this);
+        list = boardDAO.getListBoards();
         //Toast.makeText(getApplicationContext(), "Init ---" + String.valueOf(list.size()), Toast.LENGTH_SHORT).show();
         adapter = new BoardAdapter(list, this);
         listView = (ListView) findViewById(R.id.listViewBoard);
@@ -51,9 +51,12 @@ public class BoardActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(),
-                        "Redirect to list tasks of board in position " + String.valueOf(position)
-                        , Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(),
+//                        "Redirect to list tasks of board in position " + String.valueOf(position)
+//                        , Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(BoardActivity.this, MainActivity.class);
+                intent.putExtra("boardId", boardDAO.getListBoards().get(position).getId());
+                startActivity(intent);
             }
         });
     }
@@ -61,7 +64,7 @@ public class BoardActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 100 && resultCode == 200){
-            list = bdh.getListBoards();
+            list = boardDAO.getListBoards();
             adapter = new BoardAdapter(list, this);
             listView = (ListView) findViewById(R.id.listViewBoard);
             listView.setAdapter(adapter);
@@ -72,6 +75,6 @@ public class BoardActivity extends AppCompatActivity {
     public static List<Board> getBoardList(){
         return list;
     }
-    public static BoardDatabaseHelper getBoardDatabase(){return bdh;};
+    public static BoardDAO getBoardDatabase(){return boardDAO;};
     public static BoardAdapter getAdapter(){return ((BoardAdapter)listView.getAdapter());};
 }
