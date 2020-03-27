@@ -23,7 +23,7 @@ public class TaskDAO extends ModelDAO {
     //get
     public Task getTaskById(int taskId) {
         Cursor cursor = db.query("task",
-                new String[]{"id", "title", "date", "description", "status", "urgent_importance", "group_id"},
+                new String[]{"id", "title", "date", "description", "status", "urgent_importance", "image", "group_id"},
                 "id = ?",
                 new String[]{String.valueOf(taskId)},
                 null, null, null, null);
@@ -133,12 +133,12 @@ public class TaskDAO extends ModelDAO {
     /**
      * Delete Task by id.
      *
-     * @param task
+     * @param taskId
      * @return the number of rows affected if a whereClause is passed in, 0 otherwise
      */
-    public int deleteTaskById(Task task) {
+    public int deleteTaskById(int taskId) {
         return db.delete("task",
                 "id = ?",
-                new String[]{String.valueOf(task.getId())});
+                new String[]{String.valueOf(taskId)});
     }
 }

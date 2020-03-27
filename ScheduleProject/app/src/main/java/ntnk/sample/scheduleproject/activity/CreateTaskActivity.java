@@ -1,6 +1,7 @@
 package ntnk.sample.scheduleproject.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -77,13 +78,11 @@ public class CreateTaskActivity extends AppCompatActivity {
     TimePickerDialog timePickerDialog;
     DatePickerDialog datePickerDialog;
 
-    TaskDAO taskDB;
-    int current_group_id = -1;
+    TaskDAO taskDAO;
+    int groupId;
+
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_GALLERY_PHOTO = 2;
-//    static final int MAX_NUMBER_IMAGE = 5;
-//    private List<Bitmap> bitmaps;
-//    private List<TaskImage> taskImages;//max size = 5
 
     File mPhotoFile;
     FileCompressor mCompressor;
@@ -93,23 +92,29 @@ public class CreateTaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        groupId = intent.getIntExtra("groupId", -1);
+        if(groupId  < 0){
+            setContentView(R.layout.activity_create_task_inactive);
+            return;
+        }
         setContentView(R.layout.activity_create_task);
 
         assignUIComponent();
-        taskDB = new TaskDAO(this);
-        Intent intent = getIntent();
-        current_group_id = intent.getIntExtra("group_id", -1);
-//        bitmaps = new ArrayList<>();
-//        taskImages = new ArrayList<>();
+        taskDAO = new TaskDAO(this);
 
         dateStr = "";
         timeStr = "";
+        setDefaultDateTime();
 
         ButterKnife.bind(this);
         mCompressor = new FileCompressor(this);
+
+
     }
 
-    private void assignUIComponent() {
+    private void assignUIComponent(){
         editTextTitle = findViewById(R.id.editTextTitle);
         editTextDate = findViewById(R.id.editTextDate);
         editTextDate.setKeyListener(null);
@@ -125,7 +130,20 @@ public class CreateTaskActivity extends AppCompatActivity {
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
     }
 
-    public void datePickerAction(View view) {
+
+    private void setDefaultDateTime(){
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DATE);
+        int hour = calendar.get(Calendar.HOUR);
+        int minute = calendar.get(Calendar.MINUTE);
+        dateStr = year +"-"+month + "-" + day;
+        timeStr = hour +":"+minute;
+        editTextDate.setText(dateStr+ " " + timeStr);
+    }
+
+    public void datePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -133,43 +151,42 @@ public class CreateTaskActivity extends AppCompatActivity {
         datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                dateStr = year + "-" + month + "-" + dayOfMonth;
-                editTextDate.setText(dateStr + " " + timeStr);
+                dateStr = year +"-"+month + "-" + dayOfMonth;
+                editTextDate.setText(dateStr+ " " + timeStr);
             }
         }, year, month, day);
         datePickerDialog.show();
     }
 
-    public void timePickerAction(View view) {
+    public void timePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR);
         int minute = calendar.get(Calendar.MINUTE);
         timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                timeStr = hourOfDay + ":" + minute;
-                if (dateStr.equals("")) {
-                    dateStr = calendar.get(Calendar.YEAR) + "-"
-                            + (calendar.get(Calendar.MONTH) + 1) + "-"
+                timeStr = hourOfDay +":"+minute;
+                if(dateStr.equals("")){
+                   dateStr = calendar.get(Calendar.YEAR) + "-"
+                            + (calendar.get(Calendar.MONTH)+1) + "-"
                             + calendar.get(Calendar.DATE);
                 }
-                editTextDate.setText(dateStr + " " + timeStr);
+                editTextDate.setText(dateStr+ " " + timeStr);
             }
         }, hour, minute, true);
         timePickerDialog.show();
     }
 
-    public void cameraBtnAction(View view) {
+    public void cameraBtnAction(View view){
         requestStoragePermission(true);
     }
 
-    public void uploadBtnAction(View view) {
+    public void uploadBtnAction(View view){
         requestStoragePermission(false);
     }
 
     public void saveBtnAction(View view) {
         Task task = new Task();
-        task.setGroupId(current_group_id);
         String title = editTextTitle.getText().toString().trim();
         if (title.equals("")) {
             Toast.makeText(this, "Title must not empty", Toast.LENGTH_SHORT).show();
@@ -218,11 +235,13 @@ public class CreateTaskActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        long taskid = taskDB.insert(task);
+        task.setGroupId(groupId);
+        long taskid = taskDAO.insert(task);
+
+        Intent returnIntent = new Intent();
         task.setId((int) taskid);
-        Intent intent = new Intent();
-        intent.putExtra("new_task", task);
-        setResult(300, intent);
+        returnIntent.putExtra("new_task", task);
+        setResult(300,returnIntent);
         finish();
     }
 
@@ -232,7 +251,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
                 try {
-                    mPhotoFile = mCompressor.compressToFile(mPhotoFile);
+                mPhotoFile = mCompressor.compressToFile(mPhotoFile);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -240,8 +259,8 @@ public class CreateTaskActivity extends AppCompatActivity {
                 Glide.with(CreateTaskActivity.this)
                         .load(mPhotoFile)
                         .apply(new RequestOptions()
-                                .placeholder(R.drawable.profile_pic_place_holder))
-                        .into(imageViewProfilePic);
+                            .placeholder(R.drawable.profile_pic_place_holder))
+                    .into(imageViewProfilePic);
 
             } else if (requestCode == REQUEST_GALLERY_PHOTO) {
                 Uri selectedImage = data.getData();
@@ -251,11 +270,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Glide.with(CreateTaskActivity.this)
-                        .load(mPhotoFile)
-                        .apply(new RequestOptions()
-                                .placeholder(R.drawable.profile_pic_place_holder))
-                        .into(imageViewProfilePic);
+            Glide.with(CreateTaskActivity.this)
+                    .load(mPhotoFile)
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.profile_pic_place_holder))
+                    .into(imageViewProfilePic);
             }
         }
     }
@@ -352,7 +371,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir );
 
         // Save a file: path for use with ACTION_VIEW intents
 //        currentPhotoPath = image.getAbsolutePath();

@@ -1,18 +1,8 @@
 package ntnk.sample.scheduleproject.sqlite;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import ntnk.sample.scheduleproject.entity.Task;
 
 public class TaskDatabaseHelper extends SQLiteOpenHelper {
 
@@ -78,7 +68,5 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(drop_board);
         onCreate(db);
     }
-
-
 
 }
