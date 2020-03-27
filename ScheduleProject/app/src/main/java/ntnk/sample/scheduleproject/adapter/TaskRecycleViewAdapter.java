@@ -97,7 +97,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             removeItem(currentPosition);
-                            taskDB.deleteTaskById(chosen);
+                            taskDB.deleteTaskById(chosen.getId());
 
                             Toast.makeText(activity, "DELETED! As you wish!", Toast.LENGTH_SHORT).show();
                         }
@@ -116,10 +116,10 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
         return resultSearchList.size();
     }
 
-    public void addItem(int position, Task task) {
-        resultSearchList.add(position, task);
-        taskList.add(position, task);
-        notifyItemInserted(position);
+    public void addItem(Task task) {
+        resultSearchList.add( task);
+        //taskList.add(task);
+        notifyDataSetChanged();
     }
 
     public void removeItem(int position) {

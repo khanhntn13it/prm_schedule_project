@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 taskGroupDB.update(updateGroup);
                 taskGroupPagerAdapter.notifyDataSetChanged();
                 //change menu_layout to search
-                updateMenu(R.menu.search_menu, boardName, false);
+                updateMenu(R.menu.search_menu, boardName, true);
             }
         }
 
@@ -170,8 +170,7 @@ public class MainActivity extends AppCompatActivity {
              if(requestCode == 400 && resultCode == 300) {
                     setCurrentTaskRecycleViewAdapter();
                     Task newTask = (Task) data.getSerializableExtra("new_task");
-                    int size = taskRecycleViewAdapter.getItemCount();
-                    taskRecycleViewAdapter.addItem(size, newTask);
+                    taskRecycleViewAdapter.addItem(newTask);
                 }
         }
     }
