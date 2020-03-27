@@ -1,10 +1,9 @@
 package ntnk.sample.scheduleproject.activity;
 
-import android.app.SearchManager;
-import android.content.Context;
+import android.app.ActionBar;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,20 +12,24 @@ import android.widget.EditText;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPagerUtils;
 
-import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.adapter.TaskGroupPagerAdapter;
 import ntnk.sample.scheduleproject.adapter.TaskRecycleViewAdapter;
+import ntnk.sample.scheduleproject.entity.Board;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.entity.TaskGroup;
+import ntnk.sample.scheduleproject.sqlite.BoardDAO;
+import ntnk.sample.scheduleproject.sqlite.TaskGroupDAO;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -37,31 +40,35 @@ public class MainActivity extends AppCompatActivity {
     ViewPager taskGroupViewPager;
     Button addListButton;
     int menu_layout = R.menu.search_menu;
-
+    TaskGroupDAO taskGroupDB;
+    BoardDAO boardDB;
+    int currentBoardId = -1; // get from intent
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         taskGroupViewPager = findViewById(R.id.viewPager);
         addListButton = findViewById(R.id.addListButton);
+        taskGroupDB = new TaskGroupDAO(this);
+        boardDB = new BoardDAO(this);
+        // get Board then set actionbar
+        Intent intent = getIntent();
+        currentBoardId = intent.getIntExtra("boardId", -1);
+        Board board = boardDB.getBoardByID(currentBoardId);
+        ActionBar actionBar = getActionBar();
+        actionBar.setTitle(board.getName());
+        actionBar.setDisplayHomeAsUpEnabled(true);
         //for testing
-        taskGroupList = new ArrayList<>();
-        TaskGroup taskGroup = new TaskGroup("to do");
-        List<Task> taskList = new ArrayList<>();
-        taskList.add(new Task("Test 1"));
-        taskList.add(new Task("Test 2"));
-        taskList.add(new Task("Test 3"));
-        taskGroup.setTaskList(taskList);
-        taskGroupList.add(taskGroup);
-        taskGroupList.add(new TaskGroup("Doing", taskList, 1));
-        taskGroupList.add(new TaskGroup("Done"));
+        currentBoardId = 1;
+        taskGroupList = taskGroupDB.getTaskGroupListByBoard(currentBoardId);
+        if(taskGroupList == null) taskGroupList = new ArrayList<>();
+
         taskGroupPagerAdapter = new TaskGroupPagerAdapter(taskGroupList, this);
 
         taskGroupViewPager.setAdapter(taskGroupPagerAdapter);
-        taskGroupViewPager.setPadding(50, 50, 50, 50);
+        //taskGroupViewPager.setPadding(50, 50, 50, 50);
 
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(menu_layout, menu);
@@ -110,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
             //change menu_layout to search
             updateMenu(R.menu.search_menu, boardName, false);
         }
+        if(item.getItemId() == android.R.id.home) {
+            this.finish();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -133,6 +143,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onAddListClick(View view) {
-        taskGroupPagerAdapter.addView(taskGroupViewPager, new TaskGroup("")).requestFocus();
+        TaskGroup taskGroup = new TaskGroup("Enter title here", currentBoardId);
+        long taskGroupId = taskGroupDB.insert(taskGroup);
+        taskGroup.setId((int) taskGroupId);
+        taskGroupPagerAdapter.addView(taskGroupViewPager, taskGroup).requestFocus();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null) {
+            switch (resultCode) {
+                //case insert
+                case 100: {
+                    setCurrentTaskRecycleViewAdapter();
+                    Task newTask = (Task) data.getSerializableExtra("new_task");
+                    taskRecycleViewAdapter.addItem(taskRecycleViewAdapter.getItemCount(), newTask);
+                }
+                // case update
+                case 200: {
+                    setCurrentTaskRecycleViewAdapter();
+                    Task newTask = (Task) data.getSerializableExtra("new_task");
+                    int posi = data.getIntExtra("position", -1);
+                    if (posi != -1) {
+                        taskRecycleViewAdapter.updateItem(posi, newTask);
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void setCurrentTaskRecycleViewAdapter() {
+        View child = ViewPagerUtils.getCurrentView(taskGroupViewPager);
+        RecyclerView currentRecycleView = child.findViewById(R.id.listTaskRecycleView);
+        taskRecycleViewAdapter = (TaskRecycleViewAdapter) currentRecycleView.getAdapter();
     }
 }

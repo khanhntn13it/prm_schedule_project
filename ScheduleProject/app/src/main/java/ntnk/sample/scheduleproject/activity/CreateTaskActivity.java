@@ -50,9 +50,7 @@ import butterknife.ButterKnife;
 import ntnk.sample.scheduleproject.BuildConfig;
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.entity.Task;
-import ntnk.sample.scheduleproject.entity.TaskImage;
-import ntnk.sample.scheduleproject.sqlite.TaskDatabaseHelper;
-import ntnk.sample.scheduleproject.sqlite.TaskImageDBHelper;
+import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.utils.FileCompressor;
 
 public class CreateTaskActivity extends AppCompatActivity {
@@ -79,9 +77,8 @@ public class CreateTaskActivity extends AppCompatActivity {
     TimePickerDialog timePickerDialog;
     DatePickerDialog datePickerDialog;
 
-    TaskDatabaseHelper taskDB;
-    TaskImageDBHelper taskImageDBHelper;
-
+    TaskDAO taskDB;
+    int current_group_id = -1;
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_GALLERY_PHOTO = 2;
 //    static final int MAX_NUMBER_IMAGE = 5;
@@ -99,9 +96,9 @@ public class CreateTaskActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_task);
 
         assignUIComponent();
-        taskDB = new TaskDatabaseHelper(this);
-        taskImageDBHelper = new TaskImageDBHelper(this);
-
+        taskDB = new TaskDAO(this);
+        Intent intent = getIntent();
+        current_group_id = intent.getIntExtra("group_id", -1);
 //        bitmaps = new ArrayList<>();
 //        taskImages = new ArrayList<>();
 
@@ -112,7 +109,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         mCompressor = new FileCompressor(this);
     }
 
-    private void assignUIComponent(){
+    private void assignUIComponent() {
         editTextTitle = findViewById(R.id.editTextTitle);
         editTextDate = findViewById(R.id.editTextDate);
         editTextDate.setKeyListener(null);
@@ -128,7 +125,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
     }
 
-    public void datePickerAction(View view){
+    public void datePickerAction(View view) {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -136,44 +133,45 @@ public class CreateTaskActivity extends AppCompatActivity {
         datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                dateStr = year +"-"+month + "-" + dayOfMonth;
-                editTextDate.setText(dateStr+ " " + timeStr);
+                dateStr = year + "-" + month + "-" + dayOfMonth;
+                editTextDate.setText(dateStr + " " + timeStr);
             }
         }, year, month, day);
         datePickerDialog.show();
     }
 
-    public void timePickerAction(View view){
+    public void timePickerAction(View view) {
         final Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR);
         int minute = calendar.get(Calendar.MINUTE);
         timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                timeStr = hourOfDay +":"+minute;
-                if(dateStr.equals("")){
-                   dateStr = calendar.get(Calendar.YEAR) + "-"
-                            + (calendar.get(Calendar.MONTH)+1) + "-"
+                timeStr = hourOfDay + ":" + minute;
+                if (dateStr.equals("")) {
+                    dateStr = calendar.get(Calendar.YEAR) + "-"
+                            + (calendar.get(Calendar.MONTH) + 1) + "-"
                             + calendar.get(Calendar.DATE);
                 }
-                editTextDate.setText(dateStr+ " " + timeStr);
+                editTextDate.setText(dateStr + " " + timeStr);
             }
         }, hour, minute, true);
         timePickerDialog.show();
     }
 
-    public void cameraBtnAction(View view){
+    public void cameraBtnAction(View view) {
         requestStoragePermission(true);
     }
 
-    public void uploadBtnAction(View view){
+    public void uploadBtnAction(View view) {
         requestStoragePermission(false);
     }
 
-    public void saveBtnAction(View view){
+    public void saveBtnAction(View view) {
         Task task = new Task();
+        task.setGroupId(current_group_id);
         String title = editTextTitle.getText().toString().trim();
-        if(title.equals("")){
+        if (title.equals("")) {
             Toast.makeText(this, "Title must not empty", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -193,38 +191,39 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         task.setDescription(editTextDescription.getText().toString().trim());
 
-        if(radioButtonNotyet.isChecked()){
+        if (radioButtonNotyet.isChecked()) {
             task.setStatus(1);
-        }else if(radioButtonDoing.isChecked()){
+        } else if (radioButtonDoing.isChecked()) {
             task.setStatus(2);
-        }else {
+        } else {
             task.setStatus(3);
         }
 
-        if(radioButtonPriority1.isChecked()){
+        if (radioButtonPriority1.isChecked()) {
             task.setUrgent_importance(1);
-        }else  if(radioButtonPriority2.isChecked()){
+        } else if (radioButtonPriority2.isChecked()) {
             task.setUrgent_importance(2);
-        }else if(radioButtonPriority3.isChecked()){
+        } else if (radioButtonPriority3.isChecked()) {
             task.setUrgent_importance(3);
-        }else{
+        } else {
             task.setUrgent_importance(4);
         }
 
-        long taskid = taskDB.insert(task);
-
-        if(mPhotoFile != null){
+        if (mPhotoFile != null) {
             try {
                 String path = mCompressor.saveToExternalStorage(mPhotoFile);
-                TaskImage taskImage = new TaskImage();
-                taskImage.setTaskId(taskid);
-                taskImage.setImage(path);
-                taskImageDBHelper.insert(taskImage);
+                task.setTaskImage(path);
                 editTextTitle.setText("image path external saved: " + path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        long taskid = taskDB.insert(task);
+        task.setId((int) taskid);
+        Intent intent = new Intent();
+        intent.putExtra("new_task", task);
+        setResult(100, intent);
+        finish();
     }
 
 
@@ -233,7 +232,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
                 try {
-                mPhotoFile = mCompressor.compressToFile(mPhotoFile);
+                    mPhotoFile = mCompressor.compressToFile(mPhotoFile);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -241,8 +240,8 @@ public class CreateTaskActivity extends AppCompatActivity {
                 Glide.with(CreateTaskActivity.this)
                         .load(mPhotoFile)
                         .apply(new RequestOptions()
-                            .placeholder(R.drawable.profile_pic_place_holder))
-                    .into(imageViewProfilePic);
+                                .placeholder(R.drawable.profile_pic_place_holder))
+                        .into(imageViewProfilePic);
 
             } else if (requestCode == REQUEST_GALLERY_PHOTO) {
                 Uri selectedImage = data.getData();
@@ -252,11 +251,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            Glide.with(CreateTaskActivity.this)
-                    .load(mPhotoFile)
-                    .apply(new RequestOptions()
-                            .placeholder(R.drawable.profile_pic_place_holder))
-                    .into(imageViewProfilePic);
+                Glide.with(CreateTaskActivity.this)
+                        .load(mPhotoFile)
+                        .apply(new RequestOptions()
+                                .placeholder(R.drawable.profile_pic_place_holder))
+                        .into(imageViewProfilePic);
             }
         }
     }
@@ -288,6 +287,7 @@ public class CreateTaskActivity extends AppCompatActivity {
                             showSettingsDialog();
                         }
                     }
+
                     @Override
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions,
                                                                    PermissionToken token) {
@@ -299,10 +299,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                     public void onError(DexterError error) {
                         Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
                     }
-                } )
+                })
                 .onSameThread()
                 .check();
     }
+
     /**
      * Showing Alert Dialog with Settings option
      * Navigates user to app settings
@@ -342,6 +343,7 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     /**
      * Create file with current timestamp name
+     *
      * @return
      * @throws IOException
      */
@@ -350,7 +352,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName, ".jpg", storageDir );
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
 
         // Save a file: path for use with ACTION_VIEW intents
 //        currentPhotoPath = image.getAbsolutePath();
@@ -398,7 +400,7 @@ public class CreateTaskActivity extends AppCompatActivity {
     public String getRealPathFromUri(Uri contentUri) {
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Images.Media.DATA };
+            String[] proj = {MediaStore.Images.Media.DATA};
             cursor = getContentResolver().query(contentUri, proj, null, null, null);
             assert cursor != null;
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);

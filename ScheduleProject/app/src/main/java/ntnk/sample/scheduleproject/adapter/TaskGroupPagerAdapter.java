@@ -63,7 +63,7 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
         return view;
     }
 
-    public View onCreateView(ViewGroup container, TaskGroup current) {
+    public View onCreateView(ViewGroup container, final TaskGroup current) {
         View view = layoutInflater.inflate(R.layout.list_card_item, container, false);
         final List<Task> taskList = current.getTaskList();
         // set-up Title
@@ -81,7 +81,8 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, CreateTaskActivity.class);
-                activity.startActivity(intent);
+                intent.putExtra("group_id", current.getId());
+                activity.startActivityForResult(intent, 100);
             }
         });
         // set up Recycle view
