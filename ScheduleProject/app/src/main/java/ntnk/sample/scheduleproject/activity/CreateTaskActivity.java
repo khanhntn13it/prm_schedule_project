@@ -127,6 +127,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
     }
 
+
     private void setDefaultDateTime(){
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -181,10 +182,10 @@ public class CreateTaskActivity extends AppCompatActivity {
         requestStoragePermission(false);
     }
 
-    public void saveBtnAction(View view){
+    public void saveBtnAction(View view) {
         Task task = new Task();
         String title = editTextTitle.getText().toString().trim();
-        if(title.equals("")){
+        if (title.equals("")) {
             Toast.makeText(this, "Title must not empty", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -204,25 +205,25 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         task.setDescription(editTextDescription.getText().toString().trim());
 
-        if(radioButtonNotyet.isChecked()){
+        if (radioButtonNotyet.isChecked()) {
             task.setStatus(1);
-        }else if(radioButtonDoing.isChecked()){
+        } else if (radioButtonDoing.isChecked()) {
             task.setStatus(2);
-        }else {
+        } else {
             task.setStatus(3);
         }
 
-        if(radioButtonPriority1.isChecked()){
+        if (radioButtonPriority1.isChecked()) {
             task.setUrgent_importance(1);
-        }else  if(radioButtonPriority2.isChecked()){
+        } else if (radioButtonPriority2.isChecked()) {
             task.setUrgent_importance(2);
-        }else if(radioButtonPriority3.isChecked()){
+        } else if (radioButtonPriority3.isChecked()) {
             task.setUrgent_importance(3);
-        }else{
+        } else {
             task.setUrgent_importance(4);
         }
 
-        if(mPhotoFile != null){
+        if (mPhotoFile != null) {
             try {
                 String path = mCompressor.saveToExternalStorage(mPhotoFile);
                 task.setTaskImage(path);
@@ -237,8 +238,8 @@ public class CreateTaskActivity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         task.setId((int) taskid);
         returnIntent.putExtra("new_task", task);
-        setResult(100,returnIntent);
-//        finish();
+        setResult(201,returnIntent);
+        finish();
     }
 
 
@@ -302,6 +303,7 @@ public class CreateTaskActivity extends AppCompatActivity {
                             showSettingsDialog();
                         }
                     }
+
                     @Override
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions,
                                                                    PermissionToken token) {
@@ -313,10 +315,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                     public void onError(DexterError error) {
                         Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
                     }
-                } )
+                })
                 .onSameThread()
                 .check();
     }
+
     /**
      * Showing Alert Dialog with Settings option
      * Navigates user to app settings
@@ -356,6 +359,7 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     /**
      * Create file with current timestamp name
+     *
      * @return
      * @throws IOException
      */
@@ -412,7 +416,7 @@ public class CreateTaskActivity extends AppCompatActivity {
     public String getRealPathFromUri(Uri contentUri) {
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Images.Media.DATA };
+            String[] proj = {MediaStore.Images.Media.DATA};
             cursor = getContentResolver().query(contentUri, proj, null, null, null);
             assert cursor != null;
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
