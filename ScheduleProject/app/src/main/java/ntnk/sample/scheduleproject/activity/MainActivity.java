@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPagerUtils;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
         taskGroupViewPager.setAdapter(taskGroupPagerAdapter);
         //taskGroupViewPager.setPadding(50, 50, 50, 50);
 
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -190,4 +194,25 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView currentRecycleView = child.findViewById(R.id.listTaskRecycleView);
         taskRecycleViewAdapter = (TaskRecycleViewAdapter) currentRecycleView.getAdapter();
     }
+
+    BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.navigation_home:
+                            Intent intent = new Intent(MainActivity.this, BoardActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_task:
+                            intent = new Intent(MainActivity.this, TodayTaskActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_notifications:
+                            intent = new Intent(MainActivity.this, NotificationActivity.class);
+                            startActivity(intent);
+                            return true;
+                    }
+                    return false;
+                }
+            };
 }

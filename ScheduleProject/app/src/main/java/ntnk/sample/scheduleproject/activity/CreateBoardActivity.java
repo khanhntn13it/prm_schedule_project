@@ -1,13 +1,17 @@
 package ntnk.sample.scheduleproject.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import ntnk.sample.scheduleproject.entity.Board;
 import ntnk.sample.scheduleproject.sqlite.BoardDAO;
@@ -19,6 +23,7 @@ public class CreateBoardActivity extends AppCompatActivity {
 
     int mDefaultColor;
     BoardDAO boardDAO;
+    BottomNavigationView bottomNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +48,7 @@ public class CreateBoardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                Board board = new Board( textName.getText().toString(), mDefaultColor);
+                Board board = new Board(textName.getText().toString(), mDefaultColor);
                 boardDAO.insert(board);
                 setResult(200, intent);
                 finish();
@@ -57,6 +62,9 @@ public class CreateBoardActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        bottomNavigation = (BottomNavigationView)findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
     }
 
     public void openColorPicker() {
@@ -72,4 +80,25 @@ public class CreateBoardActivity extends AppCompatActivity {
         });
         colorPicker.show();
     }
+
+    BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.navigation_home:
+                            Intent intent = new Intent(CreateBoardActivity.this, BoardActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_task:
+                            intent = new Intent(CreateBoardActivity.this, TodayTaskActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_notifications:
+                            intent = new Intent(CreateBoardActivity.this, NotificationActivity.class);
+                            startActivity(intent);
+                            return true;
+                    }
+                    return false;
+                }
+            };
 }

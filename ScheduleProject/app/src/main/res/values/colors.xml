@@ -14,4 +14,5 @@
     <color name="doingColor">#d6d48b</color>
     <color name="doneColor">#8bd68c</color>
     <color name="titleTaskTextColor">#ffffff</color>
+    <color name="white">#ffffff</color>
 </resources>
