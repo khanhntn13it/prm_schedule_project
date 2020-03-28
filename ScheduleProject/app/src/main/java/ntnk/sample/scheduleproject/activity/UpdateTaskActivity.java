@@ -73,7 +73,7 @@ public class UpdateTaskActivity extends AppCompatActivity {
 
     TaskDAO taskDAO;
     Task task;
-
+    int position;
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_GALLERY_PHOTO = 2;
 
@@ -91,6 +91,7 @@ public class UpdateTaskActivity extends AppCompatActivity {
         Intent intent = getIntent();
         //*****remember to fix default value*******************************
         int taskId = intent.getIntExtra("taskId", -1);
+        position = intent.getIntExtra("taskPosi", -1);
         if(taskId  < 0){
             setContentView(R.layout.activity_task_notfound);
             return;
@@ -277,8 +278,9 @@ public class UpdateTaskActivity extends AppCompatActivity {
 
         Intent returnIntent = new Intent();
         returnIntent.putExtra("update_task", task);
-        setResult(100,returnIntent);
-//        finish();
+        returnIntent.putExtra("taskPosi", position);
+        setResult(202, returnIntent);
+        finish();
     }
 
 

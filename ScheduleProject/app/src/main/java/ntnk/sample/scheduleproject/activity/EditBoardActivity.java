@@ -11,13 +11,13 @@ import android.widget.TextView;
 
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.entity.Board;
-import ntnk.sample.scheduleproject.sqlite.BoardDatabaseHelper;
+import ntnk.sample.scheduleproject.sqlite.BoardDAO;
 import yuku.ambilwarna.AmbilWarnaDialog;
 
 public class EditBoardActivity extends AppCompatActivity {
 
     int mDefaultColor;
-    BoardDatabaseHelper bdh;
+    BoardDAO boardDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class EditBoardActivity extends AppCompatActivity {
 
         final Board board = (Board)getIntent().getSerializableExtra("board");
 
-        bdh = BoardActivity.getBoardDatabase();
+        boardDAO = BoardActivity.getBoardDatabase();
         mDefaultColor = ContextCompat.getColor(EditBoardActivity.this, R.color.colorPrimary);
 
         final TextView textName = (TextView) findViewById(R.id.plainTextName);
@@ -49,7 +49,7 @@ public class EditBoardActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 board.setColor(mDefaultColor);
                 board.setName(textName.getText().toString());
-                bdh.update(board);
+                boardDAO.update(board);
                 setResult(200, intent);
                 finish();
             }
@@ -68,7 +68,7 @@ public class EditBoardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                bdh.deleteBoardById(board.getId());
+                boardDAO.deleteBoardById(board);
                 setResult(200, intent);
                 finish();
             }

@@ -63,7 +63,7 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
         return view;
     }
 
-    public View onCreateView(ViewGroup container, TaskGroup current) {
+    public View onCreateView(ViewGroup container, final TaskGroup current) {
         View view = layoutInflater.inflate(R.layout.list_card_item, container, false);
         final List<Task> taskList = current.getTaskList();
         // set-up Title
@@ -81,10 +81,11 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, CreateTaskActivity.class);
-                //pass groupId *********
 
-                //startForReult***********
-                activity.startActivity(intent);
+                //pass groupId *********
+                intent.putExtra("groupId", current.getId());
+                //startForResult***********
+                activity.startActivityForResult(intent, 101);
             }
         });
         // set up Recycle view
@@ -109,8 +110,13 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView((View) object);
     }
-
+    public TaskGroup getItemTaskGroup(int position) {
+        return taskGroupList.get(position);
+    }
     public void onEditTitleClick(EditText view) {
+        if(view.getText().toString().equals("Enter title here")) {
+            view.setText("");
+        }
         // change action bar
         ActionBar actionBar = activity.getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.ic_close_black_24dp);

@@ -13,16 +13,18 @@ import ntnk.sample.scheduleproject.entity.TaskGroup;
 
 public class BoardDAO extends ModelDAO {
     private TaskGroupDAO taskGroupDAO;
+
     public BoardDAO(Context mContext) {
         super(mContext);
         taskGroupDAO = new TaskGroupDAO(mContext);
     }
-    public List<Board> getListBoards(){
+
+    public List<Board> getListBoards() {
         Cursor cursor = db.query("board", null, null, null,
                 null, null, "id");
 
         List<Board> list = new ArrayList<>();
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             Board board = new Board(
                     cursor.getInt(cursor.getColumnIndex("id")),
                     cursor.getString(cursor.getColumnIndex("name")),
@@ -33,7 +35,21 @@ public class BoardDAO extends ModelDAO {
         return list;
     }
 
-    public void insert(Board board){
+    public Board getBoardByID(int xId) {
+        Cursor cursor = db.query("board",
+                new String[]{"id", "name", "color"},
+                "id = ?",
+                new String[]{String.valueOf(xId)},
+                null, null, null, null);
+        cursor.moveToFirst();
+        Board board = new Board(
+                cursor.getInt(cursor.getColumnIndex("id")),
+                cursor.getString(cursor.getColumnIndex("name")),
+                cursor.getInt(cursor.getColumnIndex("color")));
+        return board;
+    }
+
+    public void insert(Board board) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("id", board.getId());
         contentValues.put("name", board.getName());
@@ -42,9 +58,9 @@ public class BoardDAO extends ModelDAO {
         db.insert("board", null, contentValues);
     }
 
-    public void deleteBoardById(Board board){
+    public void deleteBoardById(Board board) {
         List<TaskGroup> taskGroups = board.getTaskGroups();
-        for(TaskGroup tg: taskGroups) {
+        for (TaskGroup tg : taskGroups) {
             db.delete("taskgroup",
                     "id = ?",
                     new String[]{String.valueOf(tg.getId())});
@@ -54,7 +70,7 @@ public class BoardDAO extends ModelDAO {
                 new String[]{String.valueOf(board.getId())});
     }
 
-    public void update(Board board){
+    public void update(Board board) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("name", board.getName());
         contentValues.put("color", board.getColor());
