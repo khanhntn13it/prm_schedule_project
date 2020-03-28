@@ -30,6 +30,7 @@ public class BoardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setUpForFirstRun();
         setContentView(R.layout.activity_board);
         list = new ArrayList<>();
         boardDAO = new BoardDAO(this);
@@ -77,4 +78,14 @@ public class BoardActivity extends AppCompatActivity {
     }
     public static BoardDAO getBoardDatabase(){return boardDAO;};
     public static BoardAdapter getAdapter(){return ((BoardAdapter)listView.getAdapter());};
+    public void setUpForFirstRun() {
+        boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                .getBoolean("isFirstRun", true);
+        if(isFirstRun) {
+            startActivity(new Intent(new Intent(this, IntroActivity.class)));
+            Toast.makeText(this, "First run", Toast.LENGTH_SHORT);
+        }
+        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+                .putBoolean("isFirstRun", false).commit();
+    }
 }
