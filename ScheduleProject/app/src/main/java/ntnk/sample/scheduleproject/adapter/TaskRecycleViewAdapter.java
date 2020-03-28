@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,20 +60,19 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
     public void onBindViewHolder(@NonNull TaskRecycleViewAdapter.ViewHolder holder, int position) {
         String title = resultSearchList.get(position).getTitle();
         holder.taskNameTextView.setText(title);
+        holder.taskNameTextView.setTextColor(activity.getResources().getColor(R.color.titleTaskTextColor));
+
         final int currentPosition = position;
         final Task chosen = resultSearchList.get(currentPosition);
 
         if (chosen.getStatus() == 1) {
             holder.itemCard.setBackgroundColor(activity.getResources().getColor(R.color.notyetColor));
-            holder.taskNameTextView.setTextColor(Color.WHITE);
         }
         if (chosen.getStatus() == 2) {
             holder.itemCard.setBackgroundColor(activity.getResources().getColor(R.color.doingColor));
-            holder.taskNameTextView.setTextColor(Color.WHITE);
         }
         if (chosen.getStatus() == 3) {
             holder.itemCard.setBackgroundColor(activity.getResources().getColor(R.color.doneColor));
-            holder.taskNameTextView.setTextColor(Color.WHITE);
         }
 
         holder.editButton.setOnClickListener(new View.OnClickListener() {
