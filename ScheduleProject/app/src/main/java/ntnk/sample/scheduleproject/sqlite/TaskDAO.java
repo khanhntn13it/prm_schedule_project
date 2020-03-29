@@ -17,6 +17,7 @@ import ntnk.sample.scheduleproject.entity.Task;
 
 public class TaskDAO extends ModelDAO {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
+    private static final String DATE_FORMAT_2 = "yyyy-MM-dd";
 
     public TaskDAO(Context mContext) {
         super(mContext);
@@ -104,7 +105,7 @@ public class TaskDAO extends ModelDAO {
             String dateStr = cursor.getString(cursor.getColumnIndex("date"));
             //parse date------
             Date date = null;
-            DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+            DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_2);
             try {
                 date = dateFormat.parse(dateStr);
             } catch (ParseException e) {
@@ -120,7 +121,9 @@ public class TaskDAO extends ModelDAO {
             //check task on today
             Calendar calen2 = Calendar.getInstance();
             calen2.setTime(date);
-            if (calen1.equals(calen2)) result.add(task);
+            if ((date.getDay() == today.getDay())
+                    && (date.getMonth() == today.getMonth())
+                    && (date.getYear() == today.getYear())) result.add(task);
         }
         return result;
     }
