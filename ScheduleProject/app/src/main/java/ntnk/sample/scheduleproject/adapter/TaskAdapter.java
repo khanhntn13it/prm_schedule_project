@@ -2,34 +2,38 @@ package ntnk.sample.scheduleproject.adapter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 import java.util.List;
 
 import ntnk.sample.scheduleproject.R;
-import ntnk.sample.scheduleproject.activity.BoardActivity;
 import ntnk.sample.scheduleproject.activity.EditBoardActivity;
 import ntnk.sample.scheduleproject.entity.Board;
+import ntnk.sample.scheduleproject.entity.Task;
 
-public class BoardAdapter extends BaseAdapter {
+public class TaskAdapter extends BaseAdapter {
 
-    private List<Board> list;
+    private List<Task> list;
     private Activity activity;
 
-    public BoardAdapter(List<Board> list){
+    public TaskAdapter(List<Task> list){
         this.list = list;
     }
 
-    public BoardAdapter(List<Board> list, Activity activity) {
+    public TaskAdapter(List<Task> list, Activity activity) {
         this.list = list;
         this.activity = activity;
     }
@@ -54,28 +58,29 @@ public class BoardAdapter extends BaseAdapter {
         View view = convertView;
 
         if(view == null) {
-            view = activity.getLayoutInflater().inflate(R.layout.board_layout, null);
+            view = activity.getLayoutInflater().inflate(R.layout.task_layout, null);
         }
 
         TextView textViewName = view.findViewById(R.id.plainTextName);
         TextView textViewColor = view.findViewById(R.id.textViewColor);
-        Button btnEdit = view.findViewById(R.id.btnEdit);
-        Button btnDelete = view.findViewById(R.id.btnDelete);
 
-        final Board board = list.get(position);
+        final Task task = list.get(position);
 
-        btnEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(activity, EditBoardActivity.class);
-                intent.putExtra("board", (Serializable) board);
-                activity.startActivityForResult(intent, 100);
-            }
-        });
-
-        textViewName.setText(board.getName());
+        textViewName.setText(task.getTitle());
+        int color = R.color.design_default_color_background;
+        switch (task.getStatus()){
+            case 1:
+                color = Integer.valueOf((activity.getResources().getColor(R.color.notyetColor)));
+                break;
+            case 2:
+                color = Integer.valueOf((activity.getResources().getColor(R.color.doingColor)));
+                break;
+            case 3:
+                color = Integer.valueOf((activity.getResources().getColor(R.color.doneColor)));
+                break;
+        }
         Drawable drawable = activity.getResources().getDrawable(R.drawable.circle);
-        drawable.setColorFilter(board.getColor(), PorterDuff.Mode.MULTIPLY);
+        drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
         textViewColor.setBackground(drawable);
 
         return view;

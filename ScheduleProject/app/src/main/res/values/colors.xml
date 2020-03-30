@@ -3,7 +3,16 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorTransparentWhite">#cccccc</color>
     <color name="colorCardBackground">#d6dadc</color>
     <color name="colorForTextButton">#48a868</color>
     <color name="colorForHeader">#edeff0</color>
+    <color name="colorForStep3">#5ed89b</color>
+    <color name="colorGreenTransparent">#e8f5e9</color>
+    <color name="colorGreen">#2e7d32</color>
+    <color name="notyetColor">#B10000</color>
+    <color name="doingColor">#B1A600</color>
+    <color name="doneColor">#0C6609</color>
+    <color name="titleTaskTextColor">#ffffff</color>
+    <color name="white">#ffffff</color>
 </resources>

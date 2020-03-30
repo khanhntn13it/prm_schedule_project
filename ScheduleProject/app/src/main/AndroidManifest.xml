@@ -17,16 +17,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <activity android:name=".activity.NotificationActivity"></activity>
+        <activity android:name=".activity.TodayTaskActivity" />
+        <activity
+            android:name=".activity.IntroActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
         <activity android:name=".activity.EditBoardActivity" />
         <activity android:name=".activity.CreateBoardActivity" />
         <activity android:name=".activity.BoardActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity android:name=".activity.CreateTaskActivity">
 
@@ -48,9 +60,9 @@
             </intent-filter>
             -->
         </activity>
+
         <activity android:name=".activity.UpdateTaskActivity"
             android:parentActivityName=".activity.BoardActivity">
-
             <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

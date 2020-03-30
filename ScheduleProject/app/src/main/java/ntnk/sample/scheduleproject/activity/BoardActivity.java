@@ -1,16 +1,20 @@
 package ntnk.sample.scheduleproject.activity;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +34,8 @@ public class BoardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setUpForFirstRun();
         setContentView(R.layout.activity_board);
         list = new ArrayList<>();
         boardDAO = new BoardDAO(this);
@@ -59,6 +65,9 @@ public class BoardActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        BottomNavigationView bottomNavigation = (BottomNavigationView)findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
     }
 
     @Override
@@ -77,4 +86,35 @@ public class BoardActivity extends AppCompatActivity {
     }
     public static BoardDAO getBoardDatabase(){return boardDAO;};
     public static BoardAdapter getAdapter(){return ((BoardAdapter)listView.getAdapter());};
+    public void setUpForFirstRun() {
+        boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                .getBoolean("isFirstRun", true);
+        if(isFirstRun) {
+            startActivity(new Intent(new Intent(this, IntroActivity.class)));
+            Toast.makeText(this, "First run", Toast.LENGTH_SHORT);
+        }
+        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+                .putBoolean("isFirstRun", false).commit();
+    }
+
+    BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.navigation_home:
+                            Intent intent = new Intent(BoardActivity.this, BoardActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_task:
+                            intent = new Intent(BoardActivity.this, TodayTaskActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_notifications:
+                            intent = new Intent(BoardActivity.this, NotificationActivity.class);
+                            startActivity(intent);
+                            return true;
+                    }
+                    return false;
+                }
+            };
 }

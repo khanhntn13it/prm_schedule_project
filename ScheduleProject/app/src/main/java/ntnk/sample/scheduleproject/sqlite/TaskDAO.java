@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import ntnk.sample.scheduleproject.entity.Task;
 
 public class TaskDAO extends ModelDAO {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
+    private static final String DATE_FORMAT_2 = "yyyy-MM-dd";
+
     public TaskDAO(Context mContext) {
         super(mContext);
     }
@@ -63,8 +66,8 @@ public class TaskDAO extends ModelDAO {
                 "group_id = ?",
                 new String[]{String.valueOf(groupId)},
                 null, null, null, null);
-        if(cursor == null) return result;
-        while(cursor.moveToNext()) {
+        if (cursor == null) return result;
+        while (cursor.moveToNext()) {
             Task task = new Task();
             task.setId(cursor.getInt(cursor.getColumnIndex("id")));
             task.setTitle(cursor.getString(cursor.getColumnIndex("title")));
@@ -88,6 +91,45 @@ public class TaskDAO extends ModelDAO {
         }
         return result;
     }
+
+    public List<Task> getTaskListByDay(Date today) {
+        Calendar calen1 = Calendar.getInstance();
+        calen1.setTime(today);
+        db = dbHelper.getReadableDatabase();
+        List<Task> result = new ArrayList<>();
+        Cursor cursor = db.query("task", null, null, null,
+                null, null, "id");
+        if (cursor == null) return result;
+        while (cursor.moveToNext()) {
+            Task task = new Task();
+            task.setId(cursor.getInt(cursor.getColumnIndex("id")));
+            task.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+            String dateStr = cursor.getString(cursor.getColumnIndex("date"));
+            //parse date------
+            Date date = null;
+            DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_2);
+            try {
+                date = dateFormat.parse(dateStr);
+            } catch (ParseException e) {
+                Log.e("TaskDatabaseHelper", "SQLite Task parse date", e);
+            }
+            //--------------
+            task.setDate(date);
+            task.setDescription(cursor.getString(cursor.getColumnIndex("description")));
+            task.setStatus(cursor.getInt(cursor.getColumnIndex("status")));
+            task.setUrgent_importance(cursor.getInt(cursor.getColumnIndex("urgent_importance")));
+            task.setGroupId(cursor.getInt(cursor.getColumnIndex("group_id")));
+            task.setTaskImage(cursor.getString(cursor.getColumnIndex("image")));
+            //check task on today
+            Calendar calen2 = Calendar.getInstance();
+            calen2.setTime(date);
+            if ((date.getDay() == today.getDay())
+                    && (date.getMonth() == today.getMonth())
+                    && (date.getYear() == today.getYear())) result.add(task);
+        }
+        return result;
+    }
+
     /**
      * Insert Task
      *

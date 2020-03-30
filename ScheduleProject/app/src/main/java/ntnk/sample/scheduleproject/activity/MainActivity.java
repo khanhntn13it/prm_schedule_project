@@ -15,11 +15,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NavUtils;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPagerUtils;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
         taskGroupViewPager.setAdapter(taskGroupPagerAdapter);
         //taskGroupViewPager.setPadding(50, 50, 50, 50);
 
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -161,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         long taskGroupId = taskGroupDB.insert(taskGroup);
         taskGroup.setId((int) taskGroupId);
         taskGroupPagerAdapter.addView(taskGroupViewPager, taskGroup).requestFocus();
+        taskGroupViewPager.setCurrentItem(getItem(+1), true);
     }
 
     @Override
@@ -171,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     setCurrentTaskRecycleViewAdapter();
                     Task newTask = (Task) data.getSerializableExtra("new_task");
                     taskRecycleViewAdapter.addItem(newTask);
+
                 }
             if(requestCode == 102 && resultCode == 202) {
                 setCurrentTaskRecycleViewAdapter();
@@ -182,10 +186,33 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+    private int getItem(int i) {
+        return taskGroupViewPager.getCurrentItem() + i;
+    }
     public void setCurrentTaskRecycleViewAdapter() {
         View child = ViewPagerUtils.getCurrentView(taskGroupViewPager);
         RecyclerView currentRecycleView = child.findViewById(R.id.listTaskRecycleView);
         taskRecycleViewAdapter = (TaskRecycleViewAdapter) currentRecycleView.getAdapter();
     }
+
+    BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.navigation_home:
+                            Intent intent = new Intent(MainActivity.this, BoardActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_task:
+                            intent = new Intent(MainActivity.this, TodayTaskActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_notifications:
+                            intent = new Intent(MainActivity.this, NotificationActivity.class);
+                            startActivity(intent);
+                            return true;
+                    }
+                    return false;
+                }
+            };
 }
