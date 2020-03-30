@@ -1,9 +1,11 @@
 package ntnk.sample.scheduleproject.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewManager;
 import android.widget.ImageView;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -63,6 +66,9 @@ public class ViewTaskActivity extends AppCompatActivity {
 
         assignUIComponent();
         displayCurrentTask();
+
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
     }
 
     private void assignUIComponent(){
@@ -149,5 +155,24 @@ public class ViewTaskActivity extends AppCompatActivity {
         finish();
     }
 
-
+    BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.navigation_home:
+                            Intent intent = new Intent(ViewTaskActivity.this, BoardActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_task:
+                            intent = new Intent(ViewTaskActivity.this, TodayTaskActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_notifications:
+                            intent = new Intent(ViewTaskActivity.this, NotificationActivity.class);
+                            startActivity(intent);
+                            return true;
+                    }
+                    return false;
+                }
+            };
 }

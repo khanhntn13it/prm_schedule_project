@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
@@ -17,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.sqlite.TaskGroupDAO;
 
 public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleViewAdapter.ViewHolder> implements Filterable {
-    public  List<Task> taskList;
+    public List<Task> taskList;
     private LayoutInflater layoutInflater;
     private List<Task> resultSearchList;
     private Activity activity;
@@ -53,12 +52,29 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
         return new ViewHolder(view);
     }
 
+    /* not yet : 1
+        doing : 2
+        done : 3
+    * */
     @Override
     public void onBindViewHolder(@NonNull TaskRecycleViewAdapter.ViewHolder holder, int position) {
         String title = resultSearchList.get(position).getTitle();
         holder.taskNameTextView.setText(title);
+        holder.taskNameTextView.setTextColor(activity.getResources().getColor(R.color.titleTaskTextColor));
+
         final int currentPosition = position;
         final Task chosen = resultSearchList.get(currentPosition);
+
+        if (chosen.getStatus() == 1) {
+            holder.itemCard.setBackgroundColor(activity.getResources().getColor(R.color.notyetColor));
+        }
+        if (chosen.getStatus() == 2) {
+            holder.itemCard.setBackgroundColor(activity.getResources().getColor(R.color.doingColor));
+        }
+        if (chosen.getStatus() == 3) {
+            holder.itemCard.setBackgroundColor(activity.getResources().getColor(R.color.doneColor));
+        }
+
         holder.editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,7 +99,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!activity.isFinishing()) {
+                if (!activity.isFinishing()) {
                     // delete task in DB
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setTitle("Confirm delete");
@@ -97,7 +113,6 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                     builder.setPositiveButton("Yup", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-
                             taskDB.deleteTaskById(chosen.getId());
                             removeItem(currentPosition);
                             Toast.makeText(activity, "DELETED! As you wish!", Toast.LENGTH_SHORT).show();
@@ -118,28 +133,26 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
     }
 
     public void addItem(Task task) {
-        resultSearchList.add( task);
-        //taskList.add(task);
+        resultSearchList.add(task);
         notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
-        //if (resultSearchList.size() == 1 || taskList.size() == 1) position = 0;
         resultSearchList.remove(position);
-        //taskList.remove(position);
         notifyDataSetChanged();
-        //notifyItemRangeChanged(position, taskList.size());
     }
+
     public void updateItem(int position, Task task) {
         resultSearchList.set(position, task);
-        //taskList.set(position, task);
         notifyItemChanged(position, task);
     }
+
     public Task getItem(int position) {
         if (resultSearchList.size() != 0)
             return resultSearchList.get(position);
         return null;
     }
+
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -176,6 +189,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
         ImageButton editButton;
         ImageButton deleteButton;
         ImageButton viewButton;
+        CardView itemCard;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -183,6 +197,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
             editButton = itemView.findViewById(R.id.buttonEditTask);
             deleteButton = itemView.findViewById(R.id.buttonDeleteTask);
             viewButton = itemView.findViewById(R.id.buttonViewTask);
+            itemCard = itemView.findViewById(R.id.itemCardView);
         }
     }
 }

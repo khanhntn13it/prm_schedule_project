@@ -51,7 +51,6 @@ public class BoardDAO extends ModelDAO {
 
     public void insert(Board board) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put("id", board.getId());
         contentValues.put("name", board.getName());
         contentValues.put("color", board.getColor());
 
