@@ -6,9 +6,9 @@
 
     <TextView
         android:id="@+id/plainTextName"
-        android:layout_width="232dp"
+        android:layout_width="340dp"
         android:layout_height="70dp"
-        android:layout_x="85dp"
+        android:layout_x="70dp"
         android:layout_y="0dp"
         android:gravity="center"
         android:textAlignment="center"
@@ -19,19 +19,9 @@
         android:id="@+id/textViewColor"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_x="20dp"
-        android:layout_y="9dp"
+        android:layout_x="10dp"
+        android:layout_y="12dp"
+        android:background="@drawable/rounded_textview"
         android:textAlignment="center" />
-
-    <Button
-        android:id="@+id/btnEdit"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_x="330dp"
-        android:layout_y="0dp"
-        android:background="@drawable/hexagon"
-        android:focusable="false"
-        android:text="@string/Edit_Button_Title"
-        android:textSize="18sp" />
 
 </AbsoluteLayout>

@@ -1,13 +1,17 @@
 package ntnk.sample.scheduleproject.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.entity.Board;
@@ -73,6 +77,9 @@ public class EditBoardActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
     }
 
     public void openColorPicker() {
@@ -88,4 +95,24 @@ public class EditBoardActivity extends AppCompatActivity {
         });
         colorPicker.show();
     }
+    BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.navigation_home:
+                            Intent intent = new Intent(EditBoardActivity.this, BoardActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_task:
+                            intent = new Intent(EditBoardActivity.this, TodayTaskActivity.class);
+                            startActivity(intent);
+                            return true;
+                        case R.id.navigation_notifications:
+                            intent = new Intent(EditBoardActivity.this, NotificationActivity.class);
+                            startActivity(intent);
+                            return true;
+                    }
+                    return false;
+                }
+            };
 }
