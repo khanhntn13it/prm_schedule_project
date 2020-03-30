@@ -483,8 +483,8 @@ public class UpdateTaskActivity extends AppCompatActivity {
                             intent = new Intent(UpdateTaskActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(UpdateTaskActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(UpdateTaskActivity.this, AboutUsActivity.class);
                             startActivity(intent);
                             return true;
                     }

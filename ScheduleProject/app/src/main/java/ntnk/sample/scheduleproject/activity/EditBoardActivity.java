@@ -107,8 +107,8 @@ public class EditBoardActivity extends AppCompatActivity {
                             intent = new Intent(EditBoardActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(EditBoardActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(EditBoardActivity.this, AboutUsActivity.class);
                             startActivity(intent);
                             return true;
                     }

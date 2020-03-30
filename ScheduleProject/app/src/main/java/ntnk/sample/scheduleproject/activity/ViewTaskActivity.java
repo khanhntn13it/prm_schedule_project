@@ -167,8 +167,8 @@ public class ViewTaskActivity extends AppCompatActivity {
                             intent = new Intent(ViewTaskActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(ViewTaskActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(ViewTaskActivity.this, AboutUsActivity.class);
                             startActivity(intent);
                             return true;
                     }

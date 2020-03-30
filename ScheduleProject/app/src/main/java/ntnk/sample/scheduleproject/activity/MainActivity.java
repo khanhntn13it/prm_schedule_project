@@ -207,8 +207,8 @@ public class MainActivity extends AppCompatActivity {
                             intent = new Intent(MainActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(MainActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(MainActivity.this, AboutUsActivity.class);
                             startActivity(intent);
                             return true;
                     }

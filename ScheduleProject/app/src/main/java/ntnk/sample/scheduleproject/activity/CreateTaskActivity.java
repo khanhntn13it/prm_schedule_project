@@ -445,8 +445,8 @@ public class CreateTaskActivity extends AppCompatActivity {
                             intent = new Intent(CreateTaskActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(CreateTaskActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(CreateTaskActivity.this, AboutUsActivity.class);
                             startActivity(intent);
                             return true;
                     }

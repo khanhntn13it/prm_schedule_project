@@ -109,8 +109,8 @@ public class BoardActivity extends AppCompatActivity {
                             intent = new Intent(BoardActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(BoardActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(BoardActivity.this, AboutUsActivity.class);
                             startActivity(intent);
                             return true;
                     }
