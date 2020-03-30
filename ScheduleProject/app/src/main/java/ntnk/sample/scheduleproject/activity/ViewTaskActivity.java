@@ -98,8 +98,6 @@ public class ViewTaskActivity extends AppCompatActivity {
             case 1 :{
                 radioButtonNotyet.setChecked(true);
                 radioButtonNotyet.setVisibility(View.VISIBLE);
-//                ((ViewManager)radioButtonDoing.getParent()).removeView(radioButtonDoing);
-//                ((ViewManager)radioButtonDone.getParent()).removeView(radioButtonDone);
                 break;
             }
             case 2 :{
@@ -145,7 +143,7 @@ public class ViewTaskActivity extends AppCompatActivity {
         }
     }
 
-    public void backBtnAction(){
+    public void backBtnAction(View view){
         finish();
     }
 

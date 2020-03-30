@@ -47,6 +47,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ntnk.sample.scheduleproject.BuildConfig;
 import ntnk.sample.scheduleproject.R;
+import ntnk.sample.scheduleproject.broadcast.NotifiTaskChannel;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.utils.FileCompressor;
@@ -80,11 +81,14 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_GALLERY_PHOTO = 2;
+    private static final String FORMAT_DATE = "yyyy-MM-dd HH:mm";
 
     File mPhotoFile;
     FileCompressor mCompressor;
     @BindView(R.id.imageViewProfilePic)
     ImageView imageViewProfilePic;
+
+    NotifiTaskChannel notifiTaskChannel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +96,10 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         groupId = intent.getIntExtra("groupId", -1);
-//        if(groupId  < 0){
-////            setContentView(R.layout.activity_create_task_inactive);
-////            return;
-////        }
+        if(groupId  < 0){
+            setContentView(R.layout.activity_create_task_inactive);
+            return;
+        }
         setContentView(R.layout.activity_create_task);
 
         assignUIComponent();
@@ -107,7 +111,8 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
         mCompressor = new FileCompressor(this);
-
+        notifiTaskChannel = new NotifiTaskChannel(this);
+        notifiTaskChannel.createNotificationChannel();
 
     }
 
@@ -129,36 +134,34 @@ public class CreateTaskActivity extends AppCompatActivity {
 
 
     private void setDefaultDateTime(){
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DATE);
-        int hour = calendar.get(Calendar.HOUR);
-        int minute = calendar.get(Calendar.MINUTE);
-        dateStr = year +"-"+month + "-" + day;
-        timeStr = hour +":"+minute;
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+        dateStr = dateFormat.format(calendar.getTime());   // year +"-"+ month+ "-" + day;
+        timeStr = timeFormat.format(calendar.getTime()); //hour + ":" + minute;
         editTextDate.setText(dateStr+ " " + timeStr);
     }
 
     public void datePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DATE);
+        int c_year = calendar.get(Calendar.YEAR);
+        int c_month = calendar.get(Calendar.MONTH) + 1;
+        int c_day = calendar.get(Calendar.DATE);
         datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                dateStr = year +"-"+month + "-" + dayOfMonth;
+                dateStr = year +"-" + (month + 1) + "-" + dayOfMonth;
                 editTextDate.setText(dateStr+ " " + timeStr);
             }
-        }, year, month, day);
+        }, c_year, c_month, c_day);
         datePickerDialog.show();
     }
 
     public void timePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR);
-        int minute = calendar.get(Calendar.MINUTE);
+        int c_hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int c_minute = calendar.get(Calendar.MINUTE);
         timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -170,7 +173,7 @@ public class CreateTaskActivity extends AppCompatActivity {
                 }
                 editTextDate.setText(dateStr+ " " + timeStr);
             }
-        }, hour, minute, true);
+        }, c_hour, c_minute, true);
         timePickerDialog.show();
     }
 
@@ -192,7 +195,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         task.setTitle(title);
 
         String dateStr = editTextDate.getText().toString().trim();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat(FORMAT_DATE);
         Date date;
         try {
             date = dateFormat.parse(dateStr);
@@ -234,9 +237,11 @@ public class CreateTaskActivity extends AppCompatActivity {
         }
         task.setGroupId(groupId);
         long taskid = taskDAO.insert(task);
+        task.setId((int) taskid);
+
+        notifiTaskChannel.setAlarm(task);
 
         Intent returnIntent = new Intent();
-        task.setId((int) taskid);
         returnIntent.putExtra("new_task", task);
         setResult(201,returnIntent);
         finish();

@@ -27,7 +27,9 @@ public class TaskDAO extends ModelDAO {
                 "id = ?",
                 new String[]{String.valueOf(taskId)},
                 null, null, null, null);
-        if (cursor == null) {
+
+        // If moveToFirst() returns false then cursor is empty
+        if (cursor == null || !cursor.moveToFirst()) {
             return null;
         }
         cursor.moveToFirst();
@@ -52,6 +54,7 @@ public class TaskDAO extends ModelDAO {
         task.setTaskImage(cursor.getString(cursor.getColumnIndex("image")));
         return task;
     }
+
     public List<Task> getTaskListByGroup(int groupId) {
         db = dbHelper.getReadableDatabase();
         List<Task> result = new ArrayList<>();
