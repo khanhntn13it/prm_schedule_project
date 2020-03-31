@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="Task" />
     <item
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/ic_notifications"
-        android:title="Notification" />
+        android:id="@+id/navigation_aboutus"
+        android:icon="@drawable/ic_about_us"
+        android:title="About Us" />
 </menu>
