@@ -78,6 +78,16 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
         if (chosen.getStatus() == 3) {
             holder.itemCard.setBackgroundColor(activity.getResources().getColor(R.color.doneColor));
         }
+        holder.itemCard.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra( "srcItem", chosen);
+                ClipData.Item item = new ClipData.Item(intent);
+                String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_INTENT};
+                ClipData data = new ClipData(v.getTag().toString(), mimeTypes, item);
+                View.DragShadowBuilder dragShadowBuilder = new View.DragShadowBuilder(v);
+                holder.itemCard.startDragAndDrop(data, dragShadowBuilder,v,0 );
 
                 return true;
             }
@@ -89,7 +99,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                 Intent intent = new Intent(activity, UpdateTaskActivity.class);
                 intent.putExtra("taskId", chosen.getId());
                 intent.putExtra("taskPosi", currentPosition);
-                activity.startActivityForResult(intent, 102);
+                activity.startActivityForResult(intent, 102,  ActivityOptions.makeSceneTransitionAnimation(activity).toBundle());
                 Toast.makeText(v.getContext(), "edit chosen " + chosen.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
