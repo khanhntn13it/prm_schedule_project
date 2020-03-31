@@ -3,6 +3,7 @@ package ntnk.sample.scheduleproject.sqlite;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class TaskGroupDAO extends ModelDAO {
                     "id = ?",
                     new String[]{String.valueOf(t.getId())});
         }
-        return db.delete("taskgroup",
+        return db.delete("task_group",
                 "id = ?",
                 new String[]{String.valueOf(taskGroup.getId())});
     }
