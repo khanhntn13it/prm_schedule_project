@@ -6,15 +6,14 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -138,7 +137,6 @@ public class CreateTaskActivity extends AppCompatActivity {
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
     }
 
-
     private void setDefaultDateTime(){
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -191,6 +189,10 @@ public class CreateTaskActivity extends AppCompatActivity {
         requestStoragePermission(false);
     }
 
+    public void backBtnAction(View view){
+        finish();
+    }
+
     public void saveBtnAction(View view) {
         Task task = new Task();
         String title = editTextTitle.getText().toString().trim();
@@ -234,13 +236,17 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         if (mPhotoFile != null) {
             try {
-                String path = mCompressor.saveToExternalStorage(mPhotoFile);
+                Uri uri = Uri.fromFile(mPhotoFile);
+                ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(uri, "r");
+                String fileName = mPhotoFile.getName();
+                String path = mCompressor.compressToFileInExternalStorage(parcelFileDescriptor.getFileDescriptor(), fileName).getPath();
+//                Toast.makeText(this, "image path external saved: " + path, Toast.LENGTH_LONG).show();
                 task.setTaskImage(path);
-                editTextTitle.setText("image path external saved: " + path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
         task.setGroupId(groupId);
         long taskid = taskDAO.insert(task);
         task.setId((int) taskid);
@@ -256,14 +262,9 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
-                try {
-                mPhotoFile = mCompressor.compressToFile(mPhotoFile);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 Glide.with(CreateTaskActivity.this)
                         .load(mPhotoFile)
                         .apply(new RequestOptions()
@@ -271,10 +272,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                     .into(imageViewProfilePic);
 
             } else if (requestCode == REQUEST_GALLERY_PHOTO) {
-                Uri selectedImage = data.getData();
+                Uri selectedImageURI = data.getData();
                 try {
-                    mPhotoFile = mCompressor.compressToFile(new File(getRealPathFromUri(selectedImage)));
-
+                    ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(selectedImageURI, "r");
+                    String fileName = "GALLERY_" + Calendar.getInstance().getTimeInMillis() + ".jpg";
+                    mPhotoFile = mCompressor.compressToFileInCache(parcelFileDescriptor.getFileDescriptor(), fileName);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -376,13 +378,10 @@ public class CreateTaskActivity extends AppCompatActivity {
      */
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "CAMERA_" + Calendar.getInstance().getTimeInMillis();
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir );
 
-        // Save a file: path for use with ACTION_VIEW intents
-//        currentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
@@ -419,25 +418,6 @@ public class CreateTaskActivity extends AppCompatActivity {
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickPhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(pickPhoto, REQUEST_GALLERY_PHOTO);
-    }
-
-    /**
-     * Get real file path from URI
-     */
-    public String getRealPathFromUri(Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = getContentResolver().query(contentUri, proj, null, null, null);
-            assert cursor != null;
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
     }
 
     BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =

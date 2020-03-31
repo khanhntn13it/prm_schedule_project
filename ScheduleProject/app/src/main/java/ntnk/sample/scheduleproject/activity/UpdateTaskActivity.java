@@ -1,19 +1,17 @@
 package ntnk.sample.scheduleproject.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.MenuItem;
@@ -24,6 +22,10 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -37,6 +39,7 @@ import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -52,7 +55,6 @@ import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.broadcast.NotifiTaskChannel;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
-import ntnk.sample.scheduleproject.sqlite.TaskDatabaseHelper;
 import ntnk.sample.scheduleproject.utils.FileCompressor;
 
 public class UpdateTaskActivity extends AppCompatActivity {
@@ -138,6 +140,8 @@ public class UpdateTaskActivity extends AppCompatActivity {
         radioButtonPriority2 = findViewById(R.id.radioButtonUI2_u);
         radioButtonPriority3 = findViewById(R.id.radioButtonUI3_u);
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4_u);
+
+        imageViewProfilePic = findViewById(R.id.imageViewProfilePic_u);
     }
 
     private void setCurrentData(){
@@ -184,11 +188,20 @@ public class UpdateTaskActivity extends AppCompatActivity {
             }
         }
         if(task.getTaskImage() != null) {
-            Glide.with(UpdateTaskActivity.this)
-                    .load(task.getTaskImage())
-                    .apply(new RequestOptions()
-                            .placeholder(R.drawable.profile_pic_place_holder))
-                    .into(imageViewProfilePic);
+            Uri uri = Uri.fromFile(new File(task.getTaskImage()));
+            try {
+                ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(uri, "r");
+                if(parcelFileDescriptor != null) {
+                    Bitmap bitmap = BitmapFactory.decodeFileDescriptor(parcelFileDescriptor.getFileDescriptor());
+                    Glide.with(UpdateTaskActivity.this)
+                            .load(bitmap)
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.profile_pic_place_holder))
+                            .into(imageViewProfilePic);
+                }
+            }catch (FileNotFoundException e){
+
+            }
         }
     }
 
@@ -224,6 +237,10 @@ public class UpdateTaskActivity extends AppCompatActivity {
             }
         }, c_hour, c_minute, true);
         timePickerDialog.show();
+    }
+
+    public void backBtnAction(View view){
+        finish();
     }
 
     public void cameraBtnAction(View view){
@@ -275,11 +292,14 @@ public class UpdateTaskActivity extends AppCompatActivity {
             task.setUrgent_importance(4);
         }
 
-        if(mPhotoFile != null){
+        if (mPhotoFile != null) {
             try {
-                String path = mCompressor.saveToExternalStorage(mPhotoFile);
+                Uri uri = Uri.fromFile(mPhotoFile);
+                ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(uri, "r");
+                String fileName = mPhotoFile.getName();
+                String path = mCompressor.compressToFileInExternalStorage(parcelFileDescriptor.getFileDescriptor(), fileName).getPath();
+//                Toast.makeText(this, "image path external saved: " + path, Toast.LENGTH_LONG).show();
                 task.setTaskImage(path);
-                editTextTitle.setText("image path external saved: " + path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -301,14 +321,9 @@ public class UpdateTaskActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
-                try {
-                    mPhotoFile = mCompressor.compressToFile(mPhotoFile);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 Glide.with(UpdateTaskActivity.this)
                         .load(mPhotoFile)
                         .apply(new RequestOptions()
@@ -316,10 +331,11 @@ public class UpdateTaskActivity extends AppCompatActivity {
                         .into(imageViewProfilePic);
 
             } else if (requestCode == REQUEST_GALLERY_PHOTO) {
-                Uri selectedImage = data.getData();
+                Uri selectedImageURI = data.getData();
                 try {
-                    mPhotoFile = mCompressor.compressToFile(new File(getRealPathFromUri(selectedImage)));
-
+                    ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(selectedImageURI, "r");
+                    String fileName = "GALLERY_" + Calendar.getInstance().getTimeInMillis() + ".jpg";
+                    mPhotoFile = mCompressor.compressToFileInCache(parcelFileDescriptor.getFileDescriptor(), fileName);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -418,13 +434,10 @@ public class UpdateTaskActivity extends AppCompatActivity {
      */
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "CAMERA_" + Calendar.getInstance().getTimeInMillis();
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir );
 
-        // Save a file: path for use with ACTION_VIEW intents
-//        currentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
@@ -463,24 +476,6 @@ public class UpdateTaskActivity extends AppCompatActivity {
         startActivityForResult(pickPhoto, REQUEST_GALLERY_PHOTO);
     }
 
-    /**
-     * Get real file path from URI
-     */
-    public String getRealPathFromUri(Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = getContentResolver().query(contentUri, proj, null, null, null);
-            assert cursor != null;
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
     BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {

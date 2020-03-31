@@ -4,13 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
 
-import org.reactivestreams.Publisher;
-
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
-import java.util.concurrent.Callable;
-
-import io.reactivex.Flowable;
 
 public class FileCompressor {
     //max width and height values of the compressed image is taken as 612x816
@@ -18,13 +14,15 @@ public class FileCompressor {
     private int maxHeight = 816;
     private Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
     private int quality = 80;
-    private String destinationDirectoryPath;
-    private String externalDirectoryPath;
+    private String cacheDirectoryPath;
+    File storageDir ;
+//    private String externalDirectoryPath;
 
     public FileCompressor(Context context) {
-        destinationDirectoryPath = context.getCacheDir().getPath() + File.separator + "images";
+        cacheDirectoryPath = context.getCacheDir().getPath() + File.separator + "images";
+        storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         // Thư mục gốc của SD Card  ==> /storage/emulated/0/xxx
-        externalDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/schedule_images";
+//        externalDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/schedule_images";
     }
 
     public FileCompressor setMaxWidth(int maxWidth) {
@@ -32,74 +30,14 @@ public class FileCompressor {
         return this;
     }
 
-    public FileCompressor setMaxHeight(int maxHeight) {
-        this.maxHeight = maxHeight;
-        return this;
-    }
-
-    public FileCompressor setCompressFormat(Bitmap.CompressFormat compressFormat) {
-        this.compressFormat = compressFormat;
-        return this;
-    }
-
-    public FileCompressor setQuality(int quality) {
-        this.quality = quality;
-        return this;
-    }
-
-    public FileCompressor setDestinationDirectoryPath(String destinationDirectoryPath) {
-        this.destinationDirectoryPath = destinationDirectoryPath;
-        return this;
-    }
-
-    public File compressToFile(File imageFile) throws IOException {
-        return compressToFile(imageFile, imageFile.getName());
-    }
-
-    public File compressToFile(File imageFile, String compressedFileName) throws IOException {
-        return ImageUtil.compressImage(imageFile, maxWidth, maxHeight, compressFormat, quality,
-                destinationDirectoryPath + File.separator + compressedFileName);
+        public File compressToFileInCache(FileDescriptor imageFile, String fileName) throws IOException {
+        String fullPath = cacheDirectoryPath + File.separator + fileName;
+        return ImageUtil.compressImage(imageFile, maxWidth, maxHeight, compressFormat, quality, fullPath);
     }
 
 
-    public Bitmap compressToBitmap(File imageFile) throws IOException {
-        return ImageUtil.decodeSampledBitmapFromFile(imageFile, maxWidth, maxHeight);
-    }
-
-    public Flowable<File> compressToFileAsFlowable(final File imageFile) {
-        return compressToFileAsFlowable(imageFile, imageFile.getName());
-    }
-
-    public Flowable<File> compressToFileAsFlowable(final File imageFile,
-                                                   final String compressedFileName) {
-        return Flowable.defer(new Callable<Publisher<? extends File>>() {
-            @Override
-            public Flowable<File> call() {
-                try {
-                    return Flowable.just(compressToFile(imageFile, compressedFileName));
-                } catch (IOException e) {
-                    return Flowable.error(e);
-                }
-            }
-        });
-    }
-
-    public Flowable<Bitmap> compressToBitmapAsFlowable(final File imageFile) {
-        return Flowable.defer(new Callable<Flowable<Bitmap>>() {
-            @Override
-            public Flowable<Bitmap> call() {
-                try {
-                    return Flowable.just(compressToBitmap(imageFile));
-                } catch (IOException e) {
-                    return Flowable.error(e);
-                }
-            }
-        });
-    }
-
-    public String saveToExternalStorage(File imageFile) throws IOException {
-        File savedFile = ImageUtil.compressImage(imageFile, maxWidth, maxHeight, compressFormat, quality,
-                externalDirectoryPath + File.separator + imageFile.getName());
-        return savedFile.getPath();
+    public File compressToFileInExternalStorage(FileDescriptor imageFile, String fileName) throws IOException {
+        String fullPath = storageDir + File.separator + "taskImages"+ File.separator + fileName;
+        return ImageUtil.compressImage(imageFile, maxWidth, maxHeight, compressFormat, quality, fullPath);
     }
 }
