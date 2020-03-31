@@ -21,7 +21,7 @@
         android:overScrollMode="never"
         android:clipToPadding="false"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/addListButton"
         android:text="@string/add_list_name"
