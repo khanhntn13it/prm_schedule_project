@@ -202,14 +202,17 @@ public class MainActivity extends AppCompatActivity {
                         case R.id.navigation_home:
                             Intent intent = new Intent(MainActivity.this, BoardActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                         case R.id.navigation_task:
                             intent = new Intent(MainActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                         case R.id.navigation_aboutus:
                             intent = new Intent(MainActivity.this, AboutUsActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                     }
                     return false;
