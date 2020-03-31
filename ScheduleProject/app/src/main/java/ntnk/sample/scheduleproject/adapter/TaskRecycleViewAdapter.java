@@ -2,6 +2,8 @@ package ntnk.sample.scheduleproject.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -60,7 +62,8 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
         done : 3
     * */
     @Override
-    public void onBindViewHolder(@NonNull TaskRecycleViewAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final TaskRecycleViewAdapter.ViewHolder holder, int position) {
+        holder.itemCard.setTag(position);
         String title = resultSearchList.get(position).getTitle();
         holder.taskNameTextView.setText(title);
         holder.taskNameTextView.setTextColor(activity.getResources().getColor(R.color.titleTaskTextColor));
@@ -77,6 +80,20 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
         if (chosen.getStatus() == 3) {
             holder.itemCard.setBackgroundColor(activity.getResources().getColor(R.color.doneColor));
         }
+
+        holder.itemCard.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra("srcItem", chosen);
+                ClipData.Item item = new ClipData.Item(intent);
+                String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_INTENT};
+                ClipData data = new ClipData(v.getTag().toString(), mimeTypes, item);
+                View.DragShadowBuilder dragShadowBuilder = new View.DragShadowBuilder(v);
+                holder.itemCard.startDragAndDrop(data, dragShadowBuilder, v, 0);
+                return true;
+            }
+        });
 
         holder.editButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,6 +152,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
 
             }
         });
+
     }
 
     @Override
