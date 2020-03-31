@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         taskGroupViewPager.setAdapter(taskGroupPagerAdapter);
         //taskGroupViewPager.setPadding(50, 50, 50, 50);
-
+        taskGroupViewPager.setPadding(100, 0, 100, 0);
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
     }
