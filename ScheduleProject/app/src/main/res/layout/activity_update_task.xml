@@ -22,8 +22,10 @@
             android:layout_width="match_parent"
             android:layout_height="43dp"
             android:gravity="center"
-            android:text="@string/update_task_header"
-            android:textSize="24sp" />
+            android:text="@string/task_edit_header"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/editTextTitle_u"
@@ -59,108 +61,118 @@
 
             <Button
                 android:id="@+id/button"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:onClick="datePickerAction"
-                android:text="@string/task_create_datePicker" />
+                android:layout_width="135dp"
+                android:layout_height="50dp"
+                android:background="@drawable/task_button_2"
+                android:paddingLeft="10dp"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:drawableLeft="@drawable/ic_date"
+                android:text="@string/task_create_datePicker"
+                android:onClick="datePickerAction"/>
 
             <Button
                 android:id="@+id/button4"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:onClick="timePickerAction"
-                android:text="@string/task_create_timePicker" />
+                android:layout_width="135dp"
+                android:layout_height="50dp"
+                android:background="@drawable/task_button_2"
+                android:paddingLeft="10dp"
+                android:layout_marginLeft="30dp"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:drawableLeft="@drawable/ic_time"
+                android:text="@string/task_create_timePicker"
+                android:onClick="timePickerAction"/>
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="200dp"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/task_create_rbtn_status"
                 android:textSize="18sp" />
 
 
             <RadioGroup
+                android:id="@+id/radioGroup_status"
                 android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/radioGroup_status">
+                android:layout_height="wrap_content">
 
                 <RadioButton
                     android:id="@+id/radioButtonNotyet_u"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="40dp"
                     android:checked="true"
                     android:text="@string/task_create_rbtn_not" />
 
                 <RadioButton
                     android:id="@+id/radioButtonDoing_u"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="40dp"
                     android:checked="false"
                     android:text="@string/task_create_rbtn_doing" />
 
                 <RadioButton
                     android:id="@+id/radioButtonDone_u"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="40dp"
                     android:checked="false"
                     android:text="@string/task_create_rbtn_done" />
 
-
             </RadioGroup>
-
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView2"
-                android:layout_width="100dp"
+                android:layout_width="89dp"
                 android:layout_height="150dp"
                 android:text="@string/task_create_priority"
                 android:textSize="18sp" />
 
             <RadioGroup
-                android:layout_width="200dp"
+                android:layout_width="224dp"
                 android:layout_height="wrap_content">
 
                 <RadioButton
                     android:id="@+id/radioButtonUI1_u"
-                    android:layout_width="150dp"
-                    android:layout_height="70dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
                     android:checked="true"
-                    android:text="RadioButton" />
+                    android:text="@string/task_priority_1" />
+
                 <RadioButton
                     android:id="@+id/radioButtonUI2_u"
-                    android:layout_width="150dp"
-                    android:layout_height="70dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
                     android:checked="false"
-                    android:text="RadioButton" />
+                    android:text="@string/task_priority_2" />
+
                 <RadioButton
                     android:id="@+id/radioButtonUI3_u"
-                    android:layout_width="150dp"
-                    android:layout_height="70dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
                     android:checked="false"
-                    android:text="RadioButton" />
+                    android:text="@string/task_priority" />
 
                 <RadioButton
                     android:id="@+id/radioButtonUI4_u"
-                    android:layout_width="150dp"
-                    android:layout_height="70dp"
+                    android:layout_width="215dp"
+                    android:layout_height="40dp"
                     android:checked="false"
-                    android:text="RadioButton" />
+                    android:text="@string/task_priority_4" />
             </RadioGroup>
 
         </LinearLayout>
@@ -168,8 +180,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView3"
@@ -183,24 +195,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/buttonCamera_u"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="cameraBtnAction"
-                    android:text="@string/task_create_camera" />
+                <ImageButton
+                    android:id="@+id/buttonCamera"
+                    android:layout_width="60dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_camera"
+                    android:background="@drawable/task_button_2"
+                    android:onClick="cameraBtnAction" />
 
-                <Button
-                    android:id="@+id/buttonUpload_u"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="1"
-                    android:onClick="uploadBtnAction"
-                    android:text="@string/task_create_upload" />
+                <ImageButton
+                    android:id="@+id/buttonUpload"
+                    android:layout_width="60dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="50dp"
+                    android:src="@drawable/ic_gallery"
+                    android:background="@drawable/task_button_2"
+                    android:onClick="uploadBtnAction" />
             </LinearLayout>
         </LinearLayout>
 
@@ -220,23 +232,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
 
             <Button
                 android:id="@+id/buttonBack_u"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:background="@drawable/task_button_3"
                 android:onClick="backBtnAction"
-                android:text="@string/btn_back" />
+                android:text="@string/btn_back"
+                android:textColor="#fff" />
+
             <Button
                 android:id="@+id/buttonSave_u"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:onClick="saveBtnAction"
                 android:layout_marginLeft="105dp"
-                android:text="@string/btn_save" />
+                android:background="@drawable/task_button"
+                android:onClick="saveBtnAction"
+                android:text="@string/btn_save"
+                android:textColor="#fff" />
         </LinearLayout>
 
     </LinearLayout>
