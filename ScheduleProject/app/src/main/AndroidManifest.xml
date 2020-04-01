@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme"
         android:requestLegacyExternalStorage="true">
 
-        <activity android:name=".activity.NotificationActivity"></activity>
+        <activity android:name=".activity.AboutUsActivity"></activity>
         <activity android:name=".activity.TodayTaskActivity" />
         <activity
             android:name=".activity.IntroActivity"

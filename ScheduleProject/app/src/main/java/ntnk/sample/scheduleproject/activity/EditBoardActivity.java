@@ -22,6 +22,7 @@ public class EditBoardActivity extends AppCompatActivity {
 
     int mDefaultColor;
     BoardDAO boardDAO;
+    TextView tvCurrentColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,7 @@ public class EditBoardActivity extends AppCompatActivity {
 
         final TextView textName = (TextView) findViewById(R.id.plainTextName);
         textName.setText(board.getName());
-        TextView tvCurrentColor = (TextView)findViewById(R.id.tvCurrentColor);
+        tvCurrentColor = (TextView)findViewById(R.id.tvCurrentColor);
         tvCurrentColor.setBackgroundColor(board.getColor());
 
         Button btnColorPicker = (Button) findViewById(R.id.btnColorPicker);
@@ -91,6 +92,7 @@ public class EditBoardActivity extends AppCompatActivity {
             @Override
             public void onOk(AmbilWarnaDialog dialog, int color) {
                 mDefaultColor = color;
+                tvCurrentColor.setBackgroundColor(color);
             }
         });
         colorPicker.show();
@@ -102,14 +104,17 @@ public class EditBoardActivity extends AppCompatActivity {
                         case R.id.navigation_home:
                             Intent intent = new Intent(EditBoardActivity.this, BoardActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                         case R.id.navigation_task:
                             intent = new Intent(EditBoardActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(EditBoardActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(EditBoardActivity.this, AboutUsActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                     }
                     return false;

@@ -1,6 +1,7 @@
 package ntnk.sample.scheduleproject.adapter;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
@@ -102,7 +103,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                 Intent intent = new Intent(activity, UpdateTaskActivity.class);
                 intent.putExtra("taskId", chosen.getId());
                 intent.putExtra("taskPosi", currentPosition);
-                activity.startActivityForResult(intent, 102);
+                activity.startActivityForResult(intent, 102,  ActivityOptions.makeSceneTransitionAnimation(activity).toBundle());
                 Toast.makeText(v.getContext(), "edit chosen " + chosen.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -228,4 +229,6 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
             itemCard = itemView.findViewById(R.id.itemCardView);
         }
     }
-}
+    }
+
+

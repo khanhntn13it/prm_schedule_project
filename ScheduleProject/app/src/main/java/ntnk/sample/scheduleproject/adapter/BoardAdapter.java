@@ -74,7 +74,7 @@ public class BoardAdapter extends BaseAdapter {
         });
 
         textViewName.setText(board.getName());
-        Drawable drawable = activity.getResources().getDrawable(R.drawable.circle);
+        Drawable drawable = activity.getResources().getDrawable(R.drawable.hexagon_white);
         drawable.setColorFilter(board.getColor(), PorterDuff.Mode.MULTIPLY);
         textViewColor.setBackground(drawable);
 
