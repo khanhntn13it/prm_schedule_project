@@ -1,21 +1,26 @@
 package ntnk.sample.scheduleproject.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewManager;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -41,7 +46,7 @@ public class ViewTaskActivity extends AppCompatActivity {
     TaskDAO taskDAO;
     Task task;
 
-    @BindView(R.id.imageViewProfilePic)
+    @BindView(R.id.imageViewProfilePic_v)
     ImageView imageViewProfilePic;
 
     @Override
@@ -50,7 +55,6 @@ public class ViewTaskActivity extends AppCompatActivity {
 
         taskDAO = new TaskDAO(this);
         Intent intent = getIntent();
-        //*****remember to fix default value*******************************
         int taskId = intent.getIntExtra("taskId", -1);
         if(taskId  < 0){
             setContentView(R.layout.activity_task_notfound);
@@ -91,6 +95,8 @@ public class ViewTaskActivity extends AppCompatActivity {
         radioButtonPriority3.setVisibility(View.GONE);
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
         radioButtonPriority4.setVisibility(View.GONE);
+
+        imageViewProfilePic = findViewById(R.id.imageViewProfilePic_v);
     }
 
     private void displayCurrentTask(){
@@ -104,8 +110,6 @@ public class ViewTaskActivity extends AppCompatActivity {
             case 1 :{
                 radioButtonNotyet.setChecked(true);
                 radioButtonNotyet.setVisibility(View.VISIBLE);
-//                ((ViewManager)radioButtonDoing.getParent()).removeView(radioButtonDoing);
-//                ((ViewManager)radioButtonDone.getParent()).removeView(radioButtonDone);
                 break;
             }
             case 2 :{
@@ -115,7 +119,7 @@ public class ViewTaskActivity extends AppCompatActivity {
             }
             case 3 :{
                 radioButtonDone.setChecked(true);
-                radioButtonDoing.setVisibility(View.VISIBLE);
+                radioButtonDone.setVisibility(View.VISIBLE);
                 break;
             }
         }
@@ -143,15 +147,24 @@ public class ViewTaskActivity extends AppCompatActivity {
             }
         }
         if(task.getTaskImage() != null) {
-            Glide.with(ViewTaskActivity.this)
-                    .load(task.getTaskImage())
-                    .apply(new RequestOptions()
-                            .placeholder(R.drawable.profile_pic_place_holder))
-                    .into(imageViewProfilePic);
+            Uri uri = Uri.fromFile(new File(task.getTaskImage()));
+            try {
+                ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(uri, "r");
+                if(parcelFileDescriptor != null) {
+                    Bitmap bitmap = BitmapFactory.decodeFileDescriptor(parcelFileDescriptor.getFileDescriptor());
+                    Glide.with(ViewTaskActivity.this)
+                            .load(bitmap)
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.profile_pic_place_holder))
+                            .into(imageViewProfilePic);
+                }
+            }catch (FileNotFoundException e){
+
+            }
         }
     }
 
-    public void backBtnAction(){
+    public void backBtnAction(View view){
         finish();
     }
 
@@ -162,14 +175,17 @@ public class ViewTaskActivity extends AppCompatActivity {
                         case R.id.navigation_home:
                             Intent intent = new Intent(ViewTaskActivity.this, BoardActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                         case R.id.navigation_task:
                             intent = new Intent(ViewTaskActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(ViewTaskActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(ViewTaskActivity.this, AboutUsActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                     }
                     return false;

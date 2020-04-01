@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "861463600596",
+    "firebase_url": "https://prm-prj-schedule.firebaseio.com",
+    "project_id": "prm-prj-schedule",
+    "storage_bucket": "prm-prj-schedule.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861463600596:android:ab1569ed2a9632bb4b8a41",
+        "android_client_info": {
+          "package_name": "ntnk.sample.scheduleproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "861463600596-1kj9ofo8qcmrfb3b8iqtnqrp7to2ams1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ntnk.sample.scheduleproject",
+            "certificate_hash": "6c5ea6c9391f05fdf7a3519d0805ed17a5832e6b"
+          }
+        },
+        {
+          "client_id": "861463600596-d0km49q09f12cp6lijq221kar2tbte5c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdtynWPLvhyH3mWzfzkI4LC0qDHAXhTc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "861463600596-d0km49q09f12cp6lijq221kar2tbte5c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

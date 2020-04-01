@@ -27,6 +27,7 @@ import java.util.List;
 import ntnk.sample.scheduleproject.R;
 import ntnk.sample.scheduleproject.activity.UpdateTaskActivity;
 import ntnk.sample.scheduleproject.activity.ViewTaskActivity;
+import ntnk.sample.scheduleproject.broadcast.NotifiTaskChannel;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.sqlite.TaskGroupDAO;
@@ -38,6 +39,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
     private Activity activity;
     private TaskDAO taskDB;
     private TaskGroupDAO taskGroupDB;
+    NotifiTaskChannel notifiTaskChannel;
 
     public TaskRecycleViewAdapter(Context context, List<Task> tasks) {
         this.layoutInflater = LayoutInflater.from(context);
@@ -46,6 +48,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
         this.activity = (Activity) context;
         taskGroupDB = new TaskGroupDAO(context);
         taskDB = new TaskDAO(context);
+        notifiTaskChannel = new NotifiTaskChannel(context);
     }
 
     @NonNull
@@ -81,7 +84,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
             @Override
             public boolean onLongClick(View v) {
                 Intent intent = new Intent();
-                intent.putExtra( "srcItem", chosen);
+                intent.putExtra("srcItem", chosen);
                 ClipData.Item item = new ClipData.Item(intent);
                 String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_INTENT};
                 ClipData data = new ClipData("", mimeTypes, item);
@@ -92,6 +95,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                 return true;
             }
         });
+
         holder.editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,8 +134,15 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                     builder.setPositiveButton("Yup", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            Task task = taskDB.getTaskById(chosen.getId());
+
                             taskDB.deleteTaskById(chosen.getId());
                             removeItem(currentPosition);
+
+                            //remove alarm********
+                            notifiTaskChannel.clearAlarm(task);
+                            //*****************
+
                             Toast.makeText(activity, "DELETED! As you wish!", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -216,4 +227,6 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
             itemCard = itemView.findViewById(R.id.itemCardView);
         }
     }
-}
+    }
+
+

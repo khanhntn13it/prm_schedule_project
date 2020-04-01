@@ -1,11 +1,6 @@
 package ntnk.sample.scheduleproject.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +8,10 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -72,6 +71,7 @@ public class BoardActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100 && resultCode == 200){
             list = boardDAO.getListBoards();
             adapter = new BoardAdapter(list, this);
@@ -104,14 +104,17 @@ public class BoardActivity extends AppCompatActivity {
                         case R.id.navigation_home:
                             Intent intent = new Intent(BoardActivity.this, BoardActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                         case R.id.navigation_task:
                             intent = new Intent(BoardActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(BoardActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(BoardActivity.this, AboutUsActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                     }
                     return false;

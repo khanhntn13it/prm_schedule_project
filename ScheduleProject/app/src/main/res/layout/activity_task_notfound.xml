@@ -13,8 +13,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="300dp"
         android:text="@string/task_notfound"
+        android:textColor="@color/design_default_color_error"
         android:textSize="18sp" />
 
 </LinearLayout>

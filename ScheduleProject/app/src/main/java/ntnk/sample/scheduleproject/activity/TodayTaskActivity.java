@@ -1,15 +1,14 @@
 package ntnk.sample.scheduleproject.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -58,14 +57,17 @@ public class TodayTaskActivity extends AppCompatActivity {
                         case R.id.navigation_home:
                             Intent intent = new Intent(TodayTaskActivity.this, BoardActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                         case R.id.navigation_task:
                             intent = new Intent(TodayTaskActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(TodayTaskActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(TodayTaskActivity.this, AboutUsActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                     }
                     return false;

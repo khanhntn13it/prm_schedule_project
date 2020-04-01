@@ -8,15 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.List;
 
 import ntnk.sample.scheduleproject.R;
-import ntnk.sample.scheduleproject.activity.BoardActivity;
 import ntnk.sample.scheduleproject.activity.EditBoardActivity;
 import ntnk.sample.scheduleproject.entity.Board;
 
@@ -74,7 +71,7 @@ public class BoardAdapter extends BaseAdapter {
         });
 
         textViewName.setText(board.getName());
-        Drawable drawable = activity.getResources().getDrawable(R.drawable.circle);
+        Drawable drawable = activity.getResources().getDrawable(R.drawable.hexagon_white);
         drawable.setColorFilter(board.getColor(), PorterDuff.Mode.MULTIPLY);
         textViewColor.setBackground(drawable);
 

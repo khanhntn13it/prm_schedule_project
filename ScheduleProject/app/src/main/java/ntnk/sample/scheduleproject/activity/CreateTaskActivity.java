@@ -6,15 +6,14 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,6 +49,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ntnk.sample.scheduleproject.BuildConfig;
 import ntnk.sample.scheduleproject.R;
+import ntnk.sample.scheduleproject.broadcast.NotifiTaskChannel;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.utils.FileCompressor;
@@ -83,11 +83,14 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_GALLERY_PHOTO = 2;
+    private static final String FORMAT_DATE = "yyyy-MM-dd HH:mm";
 
     File mPhotoFile;
     FileCompressor mCompressor;
     @BindView(R.id.imageViewProfilePic)
     ImageView imageViewProfilePic;
+
+    NotifiTaskChannel notifiTaskChannel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +98,10 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         groupId = intent.getIntExtra("groupId", -1);
-//        if(groupId  < 0){
-////            setContentView(R.layout.activity_create_task_inactive);
-////            return;
-////        }
+        if(groupId  < 0){
+            setContentView(R.layout.activity_create_task_inactive);
+            return;
+        }
         setContentView(R.layout.activity_create_task);
 
         assignUIComponent();
@@ -110,6 +113,9 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
         mCompressor = new FileCompressor(this);
+
+        notifiTaskChannel = new NotifiTaskChannel(this);
+        notifiTaskChannel.createNotificationChannel();
 
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
@@ -131,38 +137,35 @@ public class CreateTaskActivity extends AppCompatActivity {
         radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
     }
 
-
     private void setDefaultDateTime(){
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DATE);
-        int hour = calendar.get(Calendar.HOUR);
-        int minute = calendar.get(Calendar.MINUTE);
-        dateStr = year +"-"+month + "-" + day;
-        timeStr = hour +":"+minute;
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+        dateStr = dateFormat.format(calendar.getTime());   // year +"-"+ month+ "-" + day;
+        timeStr = timeFormat.format(calendar.getTime()); //hour + ":" + minute;
         editTextDate.setText(dateStr+ " " + timeStr);
     }
 
     public void datePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DATE);
+        int c_year = calendar.get(Calendar.YEAR);
+        int c_month = calendar.get(Calendar.MONTH) + 1;
+        int c_day = calendar.get(Calendar.DATE);
         datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                dateStr = year +"-"+month + "-" + dayOfMonth;
+                dateStr = year +"-" + (month + 1) + "-" + dayOfMonth;
                 editTextDate.setText(dateStr+ " " + timeStr);
             }
-        }, year, month, day);
+        }, c_year, c_month, c_day);
         datePickerDialog.show();
     }
 
     public void timePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR);
-        int minute = calendar.get(Calendar.MINUTE);
+        int c_hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int c_minute = calendar.get(Calendar.MINUTE);
         timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -174,7 +177,7 @@ public class CreateTaskActivity extends AppCompatActivity {
                 }
                 editTextDate.setText(dateStr+ " " + timeStr);
             }
-        }, hour, minute, true);
+        }, c_hour, c_minute, true);
         timePickerDialog.show();
     }
 
@@ -184,6 +187,10 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     public void uploadBtnAction(View view){
         requestStoragePermission(false);
+    }
+
+    public void backBtnAction(View view){
+        finish();
     }
 
     public void saveBtnAction(View view) {
@@ -196,7 +203,7 @@ public class CreateTaskActivity extends AppCompatActivity {
         task.setTitle(title);
 
         String dateStr = editTextDate.getText().toString().trim();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat(FORMAT_DATE);
         Date date;
         try {
             date = dateFormat.parse(dateStr);
@@ -229,18 +236,24 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         if (mPhotoFile != null) {
             try {
-                String path = mCompressor.saveToExternalStorage(mPhotoFile);
+                Uri uri = Uri.fromFile(mPhotoFile);
+                ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(uri, "r");
+                String fileName = mPhotoFile.getName();
+                String path = mCompressor.compressToFileInExternalStorage(parcelFileDescriptor.getFileDescriptor(), fileName).getPath();
+//                Toast.makeText(this, "image path external saved: " + path, Toast.LENGTH_LONG).show();
                 task.setTaskImage(path);
-                editTextTitle.setText("image path external saved: " + path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
         task.setGroupId(groupId);
         long taskid = taskDAO.insert(task);
+        task.setId((int) taskid);
+
+        notifiTaskChannel.setAlarm(task);
 
         Intent returnIntent = new Intent();
-        task.setId((int) taskid);
         returnIntent.putExtra("new_task", task);
         setResult(201,returnIntent);
         finish();
@@ -249,14 +262,9 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
-                try {
-                mPhotoFile = mCompressor.compressToFile(mPhotoFile);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 Glide.with(CreateTaskActivity.this)
                         .load(mPhotoFile)
                         .apply(new RequestOptions()
@@ -264,10 +272,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                     .into(imageViewProfilePic);
 
             } else if (requestCode == REQUEST_GALLERY_PHOTO) {
-                Uri selectedImage = data.getData();
+                Uri selectedImageURI = data.getData();
                 try {
-                    mPhotoFile = mCompressor.compressToFile(new File(getRealPathFromUri(selectedImage)));
-
+                    ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(selectedImageURI, "r");
+                    String fileName = "GALLERY_" + Calendar.getInstance().getTimeInMillis() + ".jpg";
+                    mPhotoFile = mCompressor.compressToFileInCache(parcelFileDescriptor.getFileDescriptor(), fileName);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -369,13 +378,10 @@ public class CreateTaskActivity extends AppCompatActivity {
      */
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "CAMERA_" + Calendar.getInstance().getTimeInMillis();
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir );
 
-        // Save a file: path for use with ACTION_VIEW intents
-//        currentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
@@ -414,25 +420,6 @@ public class CreateTaskActivity extends AppCompatActivity {
         startActivityForResult(pickPhoto, REQUEST_GALLERY_PHOTO);
     }
 
-    /**
-     * Get real file path from URI
-     */
-    public String getRealPathFromUri(Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = getContentResolver().query(contentUri, proj, null, null, null);
-            assert cursor != null;
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
     BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -440,14 +427,17 @@ public class CreateTaskActivity extends AppCompatActivity {
                         case R.id.navigation_home:
                             Intent intent = new Intent(CreateTaskActivity.this, BoardActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                         case R.id.navigation_task:
                             intent = new Intent(CreateTaskActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(CreateTaskActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(CreateTaskActivity.this, AboutUsActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                     }
                     return false;

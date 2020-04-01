@@ -30,7 +30,9 @@ public class TaskDAO extends ModelDAO {
                 "id = ?",
                 new String[]{String.valueOf(taskId)},
                 null, null, null, null);
-        if (cursor == null) {
+
+        // If moveToFirst() returns false then cursor is empty
+        if (cursor == null || !cursor.moveToFirst()) {
             return null;
         }
         cursor.moveToFirst();

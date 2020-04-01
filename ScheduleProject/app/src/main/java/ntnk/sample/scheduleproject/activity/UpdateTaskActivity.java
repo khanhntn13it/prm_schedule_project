@@ -1,19 +1,17 @@
 package ntnk.sample.scheduleproject.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.MenuItem;
@@ -24,6 +22,10 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -37,6 +39,7 @@ import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -49,9 +52,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ntnk.sample.scheduleproject.BuildConfig;
 import ntnk.sample.scheduleproject.R;
+import ntnk.sample.scheduleproject.broadcast.NotifiTaskChannel;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
-import ntnk.sample.scheduleproject.sqlite.TaskDatabaseHelper;
 import ntnk.sample.scheduleproject.utils.FileCompressor;
 
 public class UpdateTaskActivity extends AppCompatActivity {
@@ -79,20 +82,21 @@ public class UpdateTaskActivity extends AppCompatActivity {
     int position;
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_GALLERY_PHOTO = 2;
+    private static final String FORMAT_DATE = "yyyy-MM-dd HH:mm";
 
     File mPhotoFile;
     FileCompressor mCompressor;
-    @BindView(R.id.imageViewProfilePic)
+    @BindView(R.id.imageViewProfilePic_u)
     ImageView imageViewProfilePic;
+
+    NotifiTaskChannel notifiTaskChannel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_update_task);
 
         taskDAO = new TaskDAO(this);
         Intent intent = getIntent();
-        //*****remember to fix default value*******************************
         int taskId = intent.getIntExtra("taskId", -1);
         position = intent.getIntExtra("taskPosi", -1);
         if(taskId  < 0){
@@ -115,34 +119,40 @@ public class UpdateTaskActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mCompressor = new FileCompressor(this);
 
+        notifiTaskChannel = new NotifiTaskChannel(this);
+        notifiTaskChannel.createNotificationChannel();
+
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
     }
 
     private void assignUIComponent(){
-        editTextTitle = findViewById(R.id.editTextTitle);
-        editTextDate = findViewById(R.id.editTextDate);
+        editTextTitle = findViewById(R.id.editTextTitle_u);
+        editTextDate = findViewById(R.id.editTextDate_u);
         editTextDate.setKeyListener(null);
-        editTextDescription = findViewById(R.id.editTextDes);
+        editTextDescription = findViewById(R.id.editTextDes_u);
 
-        radioButtonNotyet = findViewById(R.id.radioButtonNotyet);
-        radioButtonDoing = findViewById(R.id.radioButtonDoing);
-        radioButtonDone = findViewById(R.id.radioButtonDone);
+        radioButtonNotyet = findViewById(R.id.radioButtonNotyet_u);
+        radioButtonDoing = findViewById(R.id.radioButtonDoing_u);
+        radioButtonDone = findViewById(R.id.radioButtonDone_u);
 
-        radioButtonPriority1 = findViewById(R.id.radioButtonUI1);
-        radioButtonPriority2 = findViewById(R.id.radioButtonUI2);
-        radioButtonPriority3 = findViewById(R.id.radioButtonUI3);
-        radioButtonPriority4 = findViewById(R.id.radioButtonUI4);
+        radioButtonPriority1 = findViewById(R.id.radioButtonUI1_u);
+        radioButtonPriority2 = findViewById(R.id.radioButtonUI2_u);
+        radioButtonPriority3 = findViewById(R.id.radioButtonUI3_u);
+        radioButtonPriority4 = findViewById(R.id.radioButtonUI4_u);
+
+        imageViewProfilePic = findViewById(R.id.imageViewProfilePic_u);
     }
 
     private void setCurrentData(){
         editTextTitle.setText(task.getTitle());
         editTextDescription.setText(task.getDescription());
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        String datetime = dateFormat.format(task.getDate());
-        editTextDate.setText(datetime);
-        dateStr = datetime.substring(0,9);
-        timeStr = datetime.substring(11);
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        dateStr = dateFormat.format(task.getDate());
+        timeStr = timeFormat.format(task.getDate());
+        editTextDate.setText(dateStr + " " + timeStr);
 
         switch (task.getStatus()){
             case 1 :{
@@ -178,33 +188,42 @@ public class UpdateTaskActivity extends AppCompatActivity {
             }
         }
         if(task.getTaskImage() != null) {
-            Glide.with(UpdateTaskActivity.this)
-                    .load(task.getTaskImage())
-                    .apply(new RequestOptions()
-                            .placeholder(R.drawable.profile_pic_place_holder))
-                    .into(imageViewProfilePic);
+            Uri uri = Uri.fromFile(new File(task.getTaskImage()));
+            try {
+                ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(uri, "r");
+                if(parcelFileDescriptor != null) {
+                    Bitmap bitmap = BitmapFactory.decodeFileDescriptor(parcelFileDescriptor.getFileDescriptor());
+                    Glide.with(UpdateTaskActivity.this)
+                            .load(bitmap)
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.profile_pic_place_holder))
+                            .into(imageViewProfilePic);
+                }
+            }catch (FileNotFoundException e){
+
+            }
         }
     }
 
     public void datePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DATE);
+        int c_year = calendar.get(Calendar.YEAR);
+        int c_month = calendar.get(Calendar.MONTH);
+        int c_day = calendar.get(Calendar.DATE);
         datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                dateStr = year +"-"+month + "-" + dayOfMonth;
+                dateStr = year +"-" + (month + 1) + "-" + dayOfMonth;
                 editTextDate.setText(dateStr+ " " + timeStr);
             }
-        }, year, month, day);
+        }, c_year, c_month, c_day);
         datePickerDialog.show();
     }
 
     public void timePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR);
-        int minute = calendar.get(Calendar.MINUTE);
+        int c_hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int c_minute = calendar.get(Calendar.MINUTE);
         timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -216,8 +235,12 @@ public class UpdateTaskActivity extends AppCompatActivity {
                 }
                 editTextDate.setText(dateStr+ " " + timeStr);
             }
-        }, hour, minute, true);
+        }, c_hour, c_minute, true);
         timePickerDialog.show();
+    }
+
+    public void backBtnAction(View view){
+        finish();
     }
 
     public void cameraBtnAction(View view){
@@ -229,7 +252,7 @@ public class UpdateTaskActivity extends AppCompatActivity {
     }
 
     public void saveBtnAction(View view){
-        Task task = new Task();
+        //get data
         String title = editTextTitle.getText().toString().trim();
         if(title.equals("")){
             Toast.makeText(this, "Title must not empty", Toast.LENGTH_SHORT).show();
@@ -238,7 +261,7 @@ public class UpdateTaskActivity extends AppCompatActivity {
         task.setTitle(title);
 
         String dateStr = editTextDate.getText().toString().trim();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat(FORMAT_DATE);
         Date date;
         try {
             date = dateFormat.parse(dateStr);
@@ -269,18 +292,25 @@ public class UpdateTaskActivity extends AppCompatActivity {
             task.setUrgent_importance(4);
         }
 
-        if(mPhotoFile != null){
+        if (mPhotoFile != null) {
             try {
-                String path = mCompressor.saveToExternalStorage(mPhotoFile);
+                Uri uri = Uri.fromFile(mPhotoFile);
+                ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(uri, "r");
+                String fileName = mPhotoFile.getName();
+                String path = mCompressor.compressToFileInExternalStorage(parcelFileDescriptor.getFileDescriptor(), fileName).getPath();
+//                Toast.makeText(this, "image path external saved: " + path, Toast.LENGTH_LONG).show();
                 task.setTaskImage(path);
-                editTextTitle.setText("image path external saved: " + path);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
+        //update
         taskDAO.update(task);
+        //set notification
+        notifiTaskChannel.setAlarm(task);
 
+        //return result
         Intent returnIntent = new Intent();
         returnIntent.putExtra("update_task", task);
         returnIntent.putExtra("taskPosi", position);
@@ -291,14 +321,9 @@ public class UpdateTaskActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
-                try {
-                    mPhotoFile = mCompressor.compressToFile(mPhotoFile);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 Glide.with(UpdateTaskActivity.this)
                         .load(mPhotoFile)
                         .apply(new RequestOptions()
@@ -306,10 +331,11 @@ public class UpdateTaskActivity extends AppCompatActivity {
                         .into(imageViewProfilePic);
 
             } else if (requestCode == REQUEST_GALLERY_PHOTO) {
-                Uri selectedImage = data.getData();
+                Uri selectedImageURI = data.getData();
                 try {
-                    mPhotoFile = mCompressor.compressToFile(new File(getRealPathFromUri(selectedImage)));
-
+                    ParcelFileDescriptor parcelFileDescriptor = this.getContentResolver().openFileDescriptor(selectedImageURI, "r");
+                    String fileName = "GALLERY_" + Calendar.getInstance().getTimeInMillis() + ".jpg";
+                    mPhotoFile = mCompressor.compressToFileInCache(parcelFileDescriptor.getFileDescriptor(), fileName);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -408,13 +434,10 @@ public class UpdateTaskActivity extends AppCompatActivity {
      */
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "CAMERA_" + Calendar.getInstance().getTimeInMillis();
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir );
 
-        // Save a file: path for use with ACTION_VIEW intents
-//        currentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
@@ -453,24 +476,6 @@ public class UpdateTaskActivity extends AppCompatActivity {
         startActivityForResult(pickPhoto, REQUEST_GALLERY_PHOTO);
     }
 
-    /**
-     * Get real file path from URI
-     */
-    public String getRealPathFromUri(Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = getContentResolver().query(contentUri, proj, null, null, null);
-            assert cursor != null;
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
     BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -478,14 +483,17 @@ public class UpdateTaskActivity extends AppCompatActivity {
                         case R.id.navigation_home:
                             Intent intent = new Intent(UpdateTaskActivity.this, BoardActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                         case R.id.navigation_task:
                             intent = new Intent(UpdateTaskActivity.this, TodayTaskActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
-                        case R.id.navigation_notifications:
-                            intent = new Intent(UpdateTaskActivity.this, NotificationActivity.class);
+                        case R.id.navigation_aboutus:
+                            intent = new Intent(UpdateTaskActivity.this, AboutUsActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(0,0);
                             return true;
                     }
                     return false;
