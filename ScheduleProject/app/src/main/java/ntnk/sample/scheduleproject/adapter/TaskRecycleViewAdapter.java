@@ -91,7 +91,7 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                 View.DragShadowBuilder dragShadowBuilder = new View.DragShadowBuilder(v);
                 holder.itemCard.startDragAndDrop(data, dragShadowBuilder,v,0 );
                 removeItem(currentPosition);
-                taskDB.deleteTaskById(chosen.getId());
+                //taskDB.deleteTaskById(chosen.getId());
                 return true;
             }
         });

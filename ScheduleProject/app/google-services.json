@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "861463600596-35j202hurf3800pdc1nhaa3v7rjhbfgt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ntnk.sample.scheduleproject",
+            "certificate_hash": "593b7a006e0209a89af76147f53e7b8a53bc3d1d"
+          }
+        },
+        {
+          "client_id": "861463600596-68q620s63iuvqmb5renibbp6edngdoif.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ntnk.sample.scheduleproject",
+            "certificate_hash": "80e88264f66c7b7abe213991a97296fe43bd9c3d"
+          }
+        },
+        {
           "client_id": "861463600596-1kj9ofo8qcmrfb3b8iqtnqrp7to2ams1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

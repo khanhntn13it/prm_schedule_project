@@ -32,7 +32,6 @@ import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.entity.TaskGroup;
 import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.sqlite.TaskGroupDAO;
-import ntnk.sample.scheduleproject.utils.ViewUtils;
 
 public class TaskGroupPagerAdapter extends PagerAdapter {
     private List<TaskGroup> taskGroupList;
@@ -159,29 +158,35 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
                 View source = (View) event.getLocalState();
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
-                        Toast.makeText(activity, "drag started", Toast.LENGTH_SHORT).show();
                     case DragEvent.ACTION_DRAG_ENTERED: {
                         Toast.makeText(activity, "drag entered", Toast.LENGTH_SHORT).show();
+                        v.setBackgroundColor(activity.getResources().getColor(R.color.colorForStep3));
                         return true;
                     }
                     case DragEvent.ACTION_DRAG_LOCATION: {
+                        v.setBackgroundColor(activity.getResources().getColor(R.color.about_description_color));
                         float posiX = event.getX();
                         float posiY = event.getY();
-                        for(int i = 0; i < pager.getChildCount(); i++) {
-                            if(ViewUtils.isPointInsideView(posiX,posiY,pager.getChildAt(i))) {
-                                targetPosition = i;
-                                pager.setCurrentItem(targetPosition);
-                                targetCurrent = pager.getChildAt(targetPosition);
-                                targetTaskgroup = getItemTaskGroup(targetPosition);
-                            }
-                        }
+                        System.out.println("ACTION_DRAG_LOCATION: View current is: "+ pager.getCurrentItem());
+//                        for(int i = 0; i < pager.getChildCount(); i++) {
+//                            if(ViewUtils.isPointInsideView(posiX,posiY,pager.getChildAt(i))) {
+//                                targetPosition = i;
+//                                pager.setCurrentItem(targetPosition);
+//                                targetCurrent = pager.getChildAt(targetPosition);
+//                                targetTaskgroup = getItemTaskGroup(targetPosition);
+//                            }
+//                        }
 
                         return true;
                     }
 
 
                     case DragEvent.ACTION_DROP: {
-
+                        v.setBackgroundColor(activity.getResources().getColor(R.color.colorPrimary));
+                        targetPosition = pager.getCurrentItem();
+                        targetTaskgroup = getItemTaskGroup(targetPosition);
+                        targetCurrent = pager.getChildAt(targetPosition);
+                        System.out.println("ACTION_DROp: View current is: "+ pager.getCurrentItem());
                         ClipData data = event.getClipData();
                         RecyclerView targetView = targetCurrent.findViewById(R.id.listTaskRecycleView);
                         targetRvAdapter = (TaskRecycleViewAdapter) targetView.getAdapter();
@@ -191,7 +196,7 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
                             targetRvAdapter.addItem(added);
                             added.setGroupId(targetTaskgroup.getId());
                             //update to DB
-                            taskDB.insert(added);
+                            //taskDB.insert(added);
                         }
                     }
 
