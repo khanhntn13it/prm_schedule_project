@@ -1,11 +1,7 @@
 package ntnk.sample.scheduleproject.entity;
 
-import android.os.Parcel;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Task implements Serializable {
     private int id;
@@ -27,6 +23,17 @@ public class Task implements Serializable {
         this.description = "";
         this.groupId = groupId;
         this.taskImage = null;
+    }
+
+    public Task(int id, String title, Date date, String description, int status, int urgent_importance, int groupId, String taskImage) {
+        this.id = id;
+        this.title = title;
+        this.date = date;
+        this.description = description;
+        this.status = status;
+        this.urgent_importance = urgent_importance;
+        this.groupId = groupId;
+        this.taskImage = taskImage;
     }
 
     public int getId() {

@@ -64,6 +64,10 @@ dependencies {
     // For filter search
     implementation 'com.allattentionhere:fabulousfilter:0.0.5'
 
+    //for notification
+//    implementation "com.android.support:support-compat:28.0.0"
+
     //for drag and drop between ViewPager
     implementation 'com.github.woxthebox:draglistview:1.7.0'
+
 }

@@ -24,15 +24,19 @@ public class CreateBoardActivity extends AppCompatActivity {
     int mDefaultColor;
     BoardDAO boardDAO;
     BottomNavigationView bottomNavigation;
+    Button btnColorPicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_board);
 
+        btnColorPicker = findViewById(R.id.btnColorPicker);
+
         boardDAO = BoardActivity.getBoardDatabase();
 
         mDefaultColor = ContextCompat.getColor(CreateBoardActivity.this, R.color.colorPrimary);
+        btnColorPicker.setBackgroundColor(mDefaultColor);
 
         final TextView textName = (TextView) findViewById(R.id.plainTextName);
         Button btnColorPicker = (Button) findViewById(R.id.btnColorPicker);
@@ -76,6 +80,7 @@ public class CreateBoardActivity extends AppCompatActivity {
             @Override
             public void onOk(AmbilWarnaDialog dialog, int color) {
                 mDefaultColor = color;
+                btnColorPicker.setBackgroundColor(color);
             }
         });
         colorPicker.show();

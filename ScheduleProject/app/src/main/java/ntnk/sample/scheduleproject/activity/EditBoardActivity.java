@@ -22,6 +22,7 @@ public class EditBoardActivity extends AppCompatActivity {
 
     int mDefaultColor;
     BoardDAO boardDAO;
+    TextView tvCurrentColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,7 @@ public class EditBoardActivity extends AppCompatActivity {
 
         final TextView textName = (TextView) findViewById(R.id.plainTextName);
         textName.setText(board.getName());
-        TextView tvCurrentColor = (TextView)findViewById(R.id.tvCurrentColor);
+        tvCurrentColor = (TextView)findViewById(R.id.tvCurrentColor);
         tvCurrentColor.setBackgroundColor(board.getColor());
 
         Button btnColorPicker = (Button) findViewById(R.id.btnColorPicker);
@@ -91,6 +92,7 @@ public class EditBoardActivity extends AppCompatActivity {
             @Override
             public void onOk(AmbilWarnaDialog dialog, int color) {
                 mDefaultColor = color;
+                tvCurrentColor.setBackgroundColor(color);
             }
         });
         colorPicker.show();

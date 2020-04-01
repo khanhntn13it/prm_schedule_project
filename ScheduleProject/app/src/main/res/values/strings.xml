@@ -37,4 +37,9 @@
     <string name="task_detail_header">Task Detail</string>
     <string name="btn_back">Back</string>
     <string name="getting_started">Getting started</string>
+    <string name="task_priority_1">Important_Urgent</string>
+    <string name="task_priority_2">Important_Not urgent</string>
+    <string name="task_priority">Not important_Urgent</string>
+    <string name="task_priority_4">Not important_Not Urgent</string>
+    <string name="task_edit_header">Edit Task</string>
 </resources>

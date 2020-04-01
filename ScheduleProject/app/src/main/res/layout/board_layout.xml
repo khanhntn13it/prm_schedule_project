@@ -17,19 +17,19 @@
 
     <TextView
         android:id="@+id/textViewColor"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_x="20dp"
-        android:layout_y="9dp"
+        android:layout_y="3dp"
         android:textAlignment="center" />
 
     <Button
         android:id="@+id/btnEdit"
         android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_height="40dp"
         android:layout_x="330dp"
-        android:layout_y="0dp"
-        android:background="@drawable/hexagon"
+        android:layout_y="15dp"
+        android:background="@drawable/task_button_3"
         android:focusable="false"
         android:text="@string/Edit_Button_Title"
         android:textSize="18sp" />

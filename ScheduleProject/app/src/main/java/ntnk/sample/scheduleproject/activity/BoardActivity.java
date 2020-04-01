@@ -72,6 +72,7 @@ public class BoardActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100 && resultCode == 200){
             list = boardDAO.getListBoards();
             adapter = new BoardAdapter(list, this);
