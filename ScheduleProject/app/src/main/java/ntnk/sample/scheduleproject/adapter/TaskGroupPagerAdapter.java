@@ -1,9 +1,11 @@
 package ntnk.sample.scheduleproject.adapter;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,24 +30,40 @@ import ntnk.sample.scheduleproject.activity.CreateTaskActivity;
 import ntnk.sample.scheduleproject.activity.MainActivity;
 import ntnk.sample.scheduleproject.entity.Task;
 import ntnk.sample.scheduleproject.entity.TaskGroup;
+import ntnk.sample.scheduleproject.sqlite.TaskDAO;
 import ntnk.sample.scheduleproject.sqlite.TaskGroupDAO;
+import ntnk.sample.scheduleproject.utils.ViewUtils;
 
 public class TaskGroupPagerAdapter extends PagerAdapter {
     private List<TaskGroup> taskGroupList;
     private LayoutInflater layoutInflater;
     private AppCompatActivity activity;
     private TaskGroupDAO taskGroupDB;
+    private TaskRecycleViewAdapter targetRvAdapter;
+    private View targetCurrent;
+    int targetPosition = -1;
+    TaskGroup targetTaskgroup = new TaskGroup();
+    TaskDAO taskDB;
 
     public TaskGroupPagerAdapter(List<TaskGroup> taskGroups, AppCompatActivity activity) {
         this.taskGroupList = taskGroups;
         this.activity = activity;
         this.layoutInflater = LayoutInflater.from(activity);
         taskGroupDB = new TaskGroupDAO(activity);
+        taskDB = new TaskDAO(activity);
     }
 
     @Override
     public int getItemPosition(@NonNull Object object) {
         return PagerAdapter.POSITION_NONE;
+    }
+
+    public int getTaskGroupPosition(@NonNull TaskGroup obj) {
+        for (int i = 0; i < taskGroupList.size(); i++) {
+            if (obj.getId() == taskGroupList.get(i).getId())
+                return i;
+        }
+        return -1;
     }
 
     @Override
@@ -69,8 +87,9 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
         return view;
     }
 
-    public View onCreateView(final ViewGroup container, final TaskGroup current,final int position) {
+    public View onCreateView(final ViewGroup container, final TaskGroup current, final int position) {
         final View view = layoutInflater.inflate(R.layout.list_card_item, container, false);
+        view.setTag(position);
         final List<Task> taskList = current.getTaskList();
         // set-up Title
         final EditText listnameText = view.findViewById(R.id.listName);
@@ -132,28 +151,54 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
         listTaskRecycleView.setItemAnimator(new DefaultItemAnimator());
         listTaskRecycleView.setAdapter(taskRecycleViewAdapter);
 
-//        container.setOnDragListener(new View.OnDragListener() {
-//            @Override
-//            public boolean onDrag(View v, DragEvent event) {
-//                Toast.makeText(activity,String.valueOf(event.getAction()) + v.toString(), Toast.LENGTH_SHORT).show();
-//                switch (event.getAction()) {
-//                    case DragEvent.ACTION_DRAG_STARTED:
-//                        Toast.makeText(activity,"drag started", Toast.LENGTH_SHORT);
-//                    case DragEvent.ACTION_DRAG_ENTERED: {
-//                        Toast.makeText(activity,"drag entered", Toast.LENGTH_SHORT);
-//                        return true;}
-//                    case DragEvent.ACTION_DRAG_LOCATION:
-//                    {   Toast.makeText(activity,"drag started", Toast.LENGTH_SHORT);
-//                        float posiX = event.getX();
-//                        float posiY = event.getY();
-//                        ViewPager pager = (ViewPager) container;
-//                        pager.setCurrentItem(position);
-//                        return true;
-//                    }
-//                }
-//                return true;
-//            }
-//        });
+        container.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                Toast.makeText(activity, String.valueOf(event.getAction()) + v.toString(), Toast.LENGTH_SHORT).show();
+                ViewPager pager = (ViewPager) v;
+                View source = (View) event.getLocalState();
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        Toast.makeText(activity, "drag started", Toast.LENGTH_SHORT).show();
+                    case DragEvent.ACTION_DRAG_ENTERED: {
+                        Toast.makeText(activity, "drag entered", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    case DragEvent.ACTION_DRAG_LOCATION: {
+                        float posiX = event.getX();
+                        float posiY = event.getY();
+                        for(int i = 0; i < pager.getChildCount(); i++) {
+                            if(ViewUtils.isPointInsideView(posiX,posiY,pager.getChildAt(i))) {
+                                targetPosition = i;
+                                pager.setCurrentItem(targetPosition);
+                                targetCurrent = pager.getChildAt(targetPosition);
+                                targetTaskgroup = getItemTaskGroup(targetPosition);
+                            }
+                        }
+
+                        return true;
+                    }
+
+
+                    case DragEvent.ACTION_DROP: {
+
+                        ClipData data = event.getClipData();
+                        RecyclerView targetView = targetCurrent.findViewById(R.id.listTaskRecycleView);
+                        targetRvAdapter = (TaskRecycleViewAdapter) targetView.getAdapter();
+                        if (targetPosition >= 0) {
+                            ClipData.Item item = data.getItemAt(0);
+                            Task added = (Task) item.getIntent().getSerializableExtra("srcItem");
+                            targetRvAdapter.addItem(added);
+                            added.setGroupId(targetTaskgroup.getId());
+                            //update to DB
+                            taskDB.insert(added);
+                        }
+                    }
+
+                }
+                return true;
+            }
+        });
         return view;
     }
 
@@ -169,11 +214,13 @@ public class TaskGroupPagerAdapter extends PagerAdapter {
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView((View) object);
     }
+
     public TaskGroup getItemTaskGroup(int position) {
         return taskGroupList.get(position);
     }
+
     public void onEditTitleClick(EditText view) {
-        if(view.getText().toString().equals("Enter title here")) {
+        if (view.getText().toString().equals("Enter title here")) {
             view.setText("");
         }
         // change action bar

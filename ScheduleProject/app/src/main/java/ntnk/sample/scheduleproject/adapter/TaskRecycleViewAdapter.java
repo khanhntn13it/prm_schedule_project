@@ -61,7 +61,6 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
     * */
     @Override
     public void onBindViewHolder(@NonNull final TaskRecycleViewAdapter.ViewHolder holder, int position) {
-        holder.itemCard.setTag(position);
         String title = resultSearchList.get(position).getTitle();
         holder.taskNameTextView.setText(title);
         holder.taskNameTextView.setTextColor(activity.getResources().getColor(R.color.titleTaskTextColor));
@@ -85,10 +84,11 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                 intent.putExtra( "srcItem", chosen);
                 ClipData.Item item = new ClipData.Item(intent);
                 String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_INTENT};
-                ClipData data = new ClipData(v.getTag().toString(), mimeTypes, item);
+                ClipData data = new ClipData("", mimeTypes, item);
                 View.DragShadowBuilder dragShadowBuilder = new View.DragShadowBuilder(v);
                 holder.itemCard.startDragAndDrop(data, dragShadowBuilder,v,0 );
-
+                removeItem(currentPosition);
+                taskDB.deleteTaskById(chosen.getId());
                 return true;
             }
         });
@@ -138,8 +138,6 @@ public class TaskRecycleViewAdapter extends RecyclerView.Adapter<TaskRecycleView
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
                 }
-
-
             }
         });
 

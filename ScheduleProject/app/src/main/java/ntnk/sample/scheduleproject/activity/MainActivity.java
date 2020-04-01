@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
-        taskGroupViewPager = findViewById(R.id.viewPager);
+        taskGroupViewPager =  findViewById(R.id.viewPager);
         addListButton = findViewById(R.id.addListButton);
         taskGroupDB = new TaskGroupDAO(this);
         boardDB = new BoardDAO(this);
