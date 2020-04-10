@@ -150,7 +150,7 @@ public class CreateTaskActivity extends AppCompatActivity {
     public void datePickerAction(View view){
         final Calendar calendar = Calendar.getInstance();
         int c_year = calendar.get(Calendar.YEAR);
-        int c_month = calendar.get(Calendar.MONTH) + 1;
+        int c_month = calendar.get(Calendar.MONTH) ;
         int c_day = calendar.get(Calendar.DATE);
         datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
