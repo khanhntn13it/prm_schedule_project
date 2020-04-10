@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="false"
+    android:layout_marginBottom="70dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="50dp"
+        android:paddingTop="20dp"
+        tools:context=".activity.UpdateTaskActivity">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="43dp"
+            android:gravity="center"
+            android:text="@string/task_edit_header"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editTextTitle_u"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="20dp"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/editTextDes_u"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:ems="10"
+            android:gravity="start|top"
+            android:layout_marginTop="10dp"
+            android:inputType="textMultiLine" />
+
+        <EditText
+            android:id="@+id/editTextDate_u"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:editable="false"
+            android:ems="10"
+            android:inputType="time" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="135dp"
+                android:layout_height="50dp"
+                android:background="@drawable/task_button_2"
+                android:paddingLeft="10dp"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:drawableLeft="@drawable/ic_date"
+                android:text="@string/task_create_datePicker"
+                android:onClick="datePickerAction"/>
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="135dp"
+                android:layout_height="50dp"
+                android:background="@drawable/task_button_2"
+                android:paddingLeft="10dp"
+                android:layout_marginLeft="30dp"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:drawableLeft="@drawable/ic_time"
+                android:text="@string/task_create_timePicker"
+                android:onClick="timePickerAction"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/task_create_rbtn_status"
+                android:textSize="18sp" />
+
+
+            <RadioGroup
+                android:id="@+id/radioGroup_status"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/radioButtonNotyet_u"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:checked="true"
+                    android:text="@string/task_create_rbtn_not" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonDoing_u"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:checked="false"
+                    android:text="@string/task_create_rbtn_doing" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonDone_u"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:checked="false"
+                    android:text="@string/task_create_rbtn_done" />
+
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="89dp"
+                android:layout_height="150dp"
+                android:text="@string/task_create_priority"
+                android:textSize="18sp" />
+
+            <RadioGroup
+                android:layout_width="224dp"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/radioButtonUI1_u"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:checked="true"
+                    android:text="@string/task_priority_1" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonUI2_u"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:checked="false"
+                    android:text="@string/task_priority_2" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonUI3_u"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:checked="false"
+                    android:text="@string/task_priority" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonUI4_u"
+                    android:layout_width="215dp"
+                    android:layout_height="40dp"
+                    android:checked="false"
+                    android:text="@string/task_priority_4" />
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/task_create_image"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/buttonCamera"
+                    android:layout_width="60dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_camera"
+                    android:background="@drawable/task_button_2"
+                    android:onClick="cameraBtnAction" />
+
+                <ImageButton
+                    android:id="@+id/buttonUpload"
+                    android:layout_width="60dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="50dp"
+                    android:src="@drawable/ic_gallery"
+                    android:background="@drawable/task_button_2"
+                    android:onClick="uploadBtnAction" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_imageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <ImageView
+                android:id="@+id/imageViewProfilePic_u"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:srcCompat="@tools:sample/avatars[3]" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/buttonBack_u"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/task_button_3"
+                android:onClick="backBtnAction"
+                android:text="@string/btn_back"
+                android:textColor="#fff" />
+
+            <Button
+                android:id="@+id/buttonSave_u"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="105dp"
+                android:background="@drawable/task_button"
+                android:onClick="saveBtnAction"
+                android:text="@string/btn_save"
+                android:textColor="#fff" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/bottom_navigation_menu"
+        />
+</RelativeLayout>

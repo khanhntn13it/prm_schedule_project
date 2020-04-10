@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/plainTextName"
+        android:layout_width="232dp"
+        android:layout_height="70dp"
+        android:layout_x="85dp"
+        android:layout_y="0dp"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewColor"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_x="20dp"
+        android:layout_y="3dp"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/btnEdit"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        android:layout_x="330dp"
+        android:layout_y="15dp"
+        android:background="@drawable/task_button_3"
+        android:focusable="false"
+        android:text="@string/Edit_Button_Title"
+        android:textSize="18sp" />
+
+</AbsoluteLayout>
